@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no,maximum-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Tonos">
+<meta name="theme-color" content="#1B1B19">
+<title>Prueba de tonos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --tinta:#1B1B19; --papel:#F5F2EA; --salvia-alta:#8DA383;
+  --humo:rgba(245,242,234,.52); --linea:rgba(245,242,234,.15);
+  --display:"Space Grotesk",-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{text-size-adjust:100%;-webkit-text-size-adjust:100%}
+body{background:var(--tinta);color:var(--papel);font-family:var(--display);
+  user-select:none;-webkit-user-select:none;overscroll-behavior:none;
+  padding:calc(env(safe-area-inset-top) + 26px) 20px calc(env(safe-area-inset-bottom) + 40px)}
+
+#sinjs{position:fixed;inset:0;z-index:99;background:var(--tinta);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:32px;text-align:center;gap:18px}
+#sinjs h2{font-size:26px;font-weight:700;letter-spacing:-.03em;max-width:16ch;line-height:1.15}
+#sinjs p{font-family:var(--mono);font-size:15px;line-height:1.75;color:var(--humo);max-width:34ch}
+#sinjs b{color:var(--papel);font-weight:500}
+#error{position:fixed;left:0;right:0;bottom:0;z-index:98;background:#7a2b22;color:#fff;
+  font-family:var(--mono);font-size:12px;padding:12px 16px;display:none;line-height:1.5}
+
+.marca{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--humo);text-transform:uppercase}
+h1{font-size:clamp(38px,10vw,54px);font-weight:700;letter-spacing:-.04em;line-height:.98;margin-top:14px}
+.intro{font-family:var(--mono);font-size:15px;line-height:1.75;color:var(--humo);margin-top:18px;max-width:38ch}
+.intro b{color:var(--papel);font-weight:500}
+
+.tarjeta{border:1px solid var(--linea);border-radius:3px;padding:22px;margin-top:16px;transition:border-color .2s}
+.tarjeta.sonando{border-color:var(--salvia-alta)}
+.fila{display:flex;align-items:baseline;gap:14px}
+.num{font-family:var(--mono);font-size:34px;font-weight:500;color:var(--salvia-alta);
+  letter-spacing:-.03em;font-variant-numeric:tabular-nums;line-height:1}
+.nom{font-size:clamp(24px,6.4vw,32px);font-weight:700;letter-spacing:-.03em;line-height:1.05}
+.desc{font-family:var(--mono);font-size:14px;line-height:1.65;color:var(--humo);margin-top:12px;max-width:36ch}
+.acciones{display:flex;gap:10px;margin-top:18px}
+button{background:none;border:1px solid var(--linea);color:var(--papel);font-family:var(--mono);
+  font-size:15px;letter-spacing:.02em;padding:15px 12px;border-radius:3px;cursor:pointer;flex:1;
+  transition:border-color .18s,background .18s}
+button:active{border-color:var(--salvia-alta);background:rgba(141,163,131,.12)}
+button.primaria{border-color:rgba(141,163,131,.5)}
+
+#hud{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(27,27,25,.94);
+  border-top:1px solid var(--linea);padding:18px 20px calc(env(safe-area-inset-bottom) + 18px);
+  display:none;align-items:center;gap:18px;backdrop-filter:blur(12px)}
+#hud .cd{font-family:var(--mono);font-size:52px;font-weight:400;letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;line-height:1;min-width:2.2ch;text-align:center}
+#hud .et{font-family:var(--mono);font-size:13px;color:var(--humo);line-height:1.55;flex:1}
+#hud .et b{display:block;color:var(--papel);font-family:var(--display);font-size:19px;
+  font-weight:500;letter-spacing:-.02em;margin-top:3px}
+#hud button{flex:0 0 auto;padding:13px 18px}
+
+.pie{font-family:var(--mono);font-size:13px;line-height:1.8;color:var(--humo);
+  margin-top:34px;padding-top:22px;border-top:1px solid var(--linea);max-width:40ch}
+.pie b{color:var(--papel);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div id="sinjs">
+  <h2>Ábrelo en Safari</h2>
+  <p>Estás viendo la <b>vista previa de Archivos</b>, que no ejecuta JavaScript ni reproduce audio. Toca compartir y elige <b>Safari</b>.</p>
+</div>
+<div id="error"></div>
+
+<div class="marca">Entrenamiento · prueba de audio</div>
+<h1>¿Cuál<br>tono?</h1>
+<p class="intro">Cuatro familias. Ninguna es un archivo de audio: se sintetizan en el momento, por eso pesan cero. <b>Sube el volumen</b> y quita el silencio del interruptor lateral.</p>
+
+<div class="tarjeta" data-f="1">
+  <div class="fila"><span class="num">01</span><span class="nom">Senoidal</span></div>
+  <p class="desc">Pitido limpio de laboratorio. Neutral, se oye claro, sin carácter.</p>
+  <div class="acciones">
+    <button data-p="1">Pitido</button>
+    <button class="primaria" data-q="1">Secuencia 9→0</button>
+  </div>
+</div>
+
+<div class="tarjeta" data-f="2">
+  <div class="fila"><span class="num">02</span><span class="nom">Consola</span></div>
+  <p class="desc">Onda cuadrada, tipo videojuego antiguo. Corta el ruido ambiente mejor que ninguna, pero es la más agresiva.</p>
+  <div class="acciones">
+    <button data-p="2">Pitido</button>
+    <button class="primaria" data-q="2">Secuencia 9→0</button>
+  </div>
+</div>
+
+<div class="tarjeta" data-f="3">
+  <div class="fila"><span class="num">03</span><span class="nom">Campana</span></div>
+  <p class="desc">Senoidal con cola larga y un armónico encima. Es la que más se parece a Freeletics. Mi apuesta.</p>
+  <div class="acciones">
+    <button data-p="3">Pitido</button>
+    <button class="primaria" data-q="3">Secuencia 9→0</button>
+  </div>
+</div>
+
+<div class="tarjeta" data-f="4">
+  <div class="fila"><span class="num">04</span><span class="nom">Bloque</span></div>
+  <p class="desc">Percusivo y seco, como claqueta de madera. Marca el tiempo sin melodía.</p>
+  <div class="acciones">
+    <button data-p="4">Pitido</button>
+    <button class="primaria" data-q="4">Secuencia 9→0</button>
+  </div>
+</div>
+
+<p class="pie">La secuencia es el descanso real: en el <b>segundo 9</b> habla la voz del sistema, del <b>5 al 1</b> suena el conteo y en <b>0</b> el tono de arranque, más grave y más largo. Dime el número y lo dejo puesto.</p>
+
+<div id="hud">
+  <span class="cd" id="cd">9</span>
+  <span class="et" id="et">Familia<b>—</b></span>
+  <button id="parar">Parar</button>
+</div>
+
+<script>
+window.onerror=function(m,s,l){var e=document.getElementById('error');
+  if(e){e.style.display='block';e.textContent='Error: '+m+' ('+l+')';} return false;};
+
+(function(){
+var q=function(id){return document.getElementById(id);};
+q('sinjs').parentNode.removeChild(q('sinjs'));
+
+var ctx=null, ruido=null, timers=[], corriendo=0;
+
+function audio(){
+  if(!ctx){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    var n=ctx.sampleRate*0.4, b=ctx.createBuffer(1,n,ctx.sampleRate), d=b.getChannelData(0);
+    for(var i=0;i<n;i++) d[i]=Math.random()*2-1;
+    ruido=b;
+  }
+  if(ctx.state==='suspended') ctx.resume();
+  return ctx;
+}
+
+/* voz del sistema: se prefiere español latinoamericano, si no hay cae a cualquier español */
+function vozES(){
+  if(!window.speechSynthesis) return null;
+  var v=speechSynthesis.getVoices()||[];
+  var orden=['es-419','es-MX','es-US','es-CO','es-AR','es-ES','es'];
+  for(var k=0;k<orden.length;k++)
+    for(var j=0;j<v.length;j++)
+      if(v[j].lang&&v[j].lang.toLowerCase().indexOf(orden[k].toLowerCase())===0) return v[j];
+  return null;
+}
+function hablar(txt){
+  try{
+    if(!window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    var u=new SpeechSynthesisUtterance(txt);
+    var v=vozES(); if(v){u.voice=v;u.lang=v.lang;} else u.lang='es-419';
+    u.rate=1; u.pitch=1; u.volume=1;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- las cuatro familias ---------- */
+function env(g,pico,dur,t){
+  g.gain.setValueAtTime(.0001,t);
+  g.gain.exponentialRampToValueAtTime(pico,t+.008);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+}
+function osc(tipo,f,pico,dur,t,filtro){
+  var c=audio(), o=c.createOscillator(), g=c.createGain(), ult=g;
+  o.type=tipo; o.frequency.setValueAtTime(f,t);
+  if(filtro){ var lp=c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=filtro;
+    o.connect(lp); lp.connect(g); } else o.connect(g);
+  g.connect(c.destination); env(g,pico,dur,t);
+  o.start(t); o.stop(t+dur+.05); return ult;
+}
+function golpe(fBanda,pico,dur,t){
+  var c=audio(), s=c.createBufferSource(), bp=c.createBiquadFilter(), g=c.createGain();
+  s.buffer=ruido; bp.type='bandpass'; bp.frequency.value=fBanda; bp.Q.value=9;
+  s.connect(bp); bp.connect(g); g.connect(c.destination);
+  env(g,pico,dur,t); s.start(t); s.stop(t+dur+.05);
+}
+
+function tono(fam,tipo){
+  var c=audio(), t=c.currentTime+.02, arr=(tipo==='arranque');
+  if(fam===1){
+    osc('sine', arr?880:660, .35, arr?.34:.13, t);
+  }else if(fam===2){
+    osc('square', arr?659:494, .16, arr?.28:.10, t, 2600);
+  }else if(fam===3){
+    var f=arr?523:880, d=arr?.95:.5;
+    osc('sine', f, .34, d, t);
+    osc('sine', f*2, .09, d*.6, t);
+  }else{
+    golpe(arr?700:1400, arr?.5:.42, arr?.13:.05, t);
+    osc('sine', arr?520:1250, arr?.2:.16, arr?.10:.04, t);
+  }
+}
+
+/* ---------- secuencia completa ---------- */
+function limpiar(){
+  timers.forEach(clearTimeout); timers=[];
+  try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){}
+  document.querySelectorAll('.tarjeta').forEach(function(x){x.classList.remove('sonando');});
+  q('hud').style.display='none'; corriendo=0;
+}
+function secuencia(fam){
+  limpiar(); audio(); corriendo=fam;
+  var nom={1:'Senoidal',2:'Consola',3:'Campana',4:'Bloque'}[fam];
+  document.querySelector('.tarjeta[data-f="'+fam+'"]').classList.add('sonando');
+  q('hud').style.display='flex';
+  q('et').innerHTML='Familia 0'+fam+'<b>'+nom+'</b>';
+  q('cd').textContent='9';
+  hablar('Sigue. Remo a una mano.');
+  for(var s=9;s>=0;s--){
+    (function(s){
+      timers.push(setTimeout(function(){
+        q('cd').textContent=s;
+        if(s>=1&&s<=5) tono(fam,'cuenta');
+        if(s===0){ tono(fam,'arranque'); timers.push(setTimeout(limpiar,1400)); }
+      },(9-s)*1000));
+    })(s);
+  }
+}
+
+document.querySelectorAll('button[data-p]').forEach(function(b){
+  b.addEventListener('click',function(){ limpiar(); tono(+b.getAttribute('data-p'),'cuenta');
+    setTimeout(function(){tono(+b.getAttribute('data-p'),'arranque');},620); });
+});
+document.querySelectorAll('button[data-q]').forEach(function(b){
+  b.addEventListener('click',function(){ secuencia(+b.getAttribute('data-q')); });
+});
+q('parar').addEventListener('click',limpiar);
+
+/* despertar voz y audio al primer toque: en iOS ninguno arranca solo */
+function despertar(){
+  audio();
+  try{ if(window.speechSynthesis){ speechSynthesis.getVoices();
+    var u=new SpeechSynthesisUtterance(' '); u.volume=0; speechSynthesis.speak(u); } }catch(e){}
+  document.removeEventListener('touchstart',despertar);
+  document.removeEventListener('click',despertar);
+}
+document.addEventListener('touchstart',despertar,{passive:true});
+document.addEventListener('click',despertar);
+if(window.speechSynthesis) speechSynthesis.onvoiceschanged=function(){};
+})();
+</script>
+</body>
+</html>
