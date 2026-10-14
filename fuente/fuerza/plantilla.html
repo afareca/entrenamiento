@@ -245,7 +245,7 @@ td input:focus{outline:none;border-color:var(--salvia)}
   <div class="k">8 semanas · 2 sesiones</div>
   <h2 style="margin-top:10px">El plan</h2>
   <table><thead><tr><th>Sem</th><th>Fase</th><th>Rondas</th><th>Desc.</th><th>RPE</th></tr></thead><tbody id="t-plan"></tbody></table>
-  <p class="humo" style="font-size:14px;margin-top:14px;line-height:1.6">Superseries: haces los dos ejercicios del bloque seguidos y descansas al cerrar el par. Entre bloques, 60 s. Semana 5: press a 12 kg si los 8 kg se sienten fáciles. Semana 7: dos repeticiones más en todo.</p>
+  <p class="humo" style="font-size:14px;margin-top:14px;line-height:1.6">Superseries: haces los dos ejercicios del bloque seguidos y descansas al cerrar el par. Entre bloques, 60 s. Cargas: swing y carry con 16 kg desde el inicio; goblet y remo pasan a 16 kg en la semana 3; split squat a 16 kg, peso muerto a una pierna y press a 12 kg en la semana 5. Si una carga nueva te saca de la técnica, quédate una semana más con la anterior. Semana 7: dos repeticiones más en todo.</p>
   <div class="regla"></div>
   <div class="k">Cardio</div>
   <p style="margin-top:8px;font-size:15px">Dos o tres caminatas de 35 minutos en zona 2: puedes hablar en frases completas pero no cantar. En Bogotá las fórmulas de frecuencia máxima sobreestiman; guíate por la conversación.</p>
@@ -300,7 +300,8 @@ function proxima(){
 /* ---------- dosis ---------- */
 var NUM=['cero','una','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve','veinte','veintiuno','veintidós'];
 function dosis(e,sem,extra){
-  var kg=(e.kg5&&sem>=5)?e.kg5:e.kg, t='', v='';
+  var kg=null, t='', v='';
+  if(e.kg){ Object.keys(e.kg).map(Number).sort(function(a,b){return a-b;}).forEach(function(w){ if(sem>=w) kg=e.kg[w]; }); }
   if(e.u==='max'){ t='Máximas menos 2'; v='máximas menos dos'; }
   else if(e.u==='seg'){ var s=e.lado?e.n/2:e.n; t=s+' s'+(e.lado?' por lado':''); v=s+' segundos'+(e.lado?' por lado':''); }
   else { var n=e.n+(extra||0); t=n+(e.lado?' por lado':' reps'); v=(NUM[n]||n)+(e.lado?' por lado':' repeticiones'); }

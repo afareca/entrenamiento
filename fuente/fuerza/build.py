@@ -8,9 +8,11 @@ def b64(p, mime):
 
 # ---------- ejercicios ----------
 # u: 'reps' (toca Hecho al terminar) · 'seg' (temporizado) · 'max' (máximas menos 2)
-# kg: carga base · kg5: carga desde la semana 5 · lado: por lado · anim: tempo del orbe si no hay GIF
-def ej(nombre, cue, gif=None, u="reps", n=None, kg=None, kg5=None, lado=False, anim=None):
-    return dict(nombre=nombre, cue=cue, gif=gif, u=u, n=n, kg=kg, kg5=kg5, lado=lado, anim=anim)
+# kg: carga, fija o por semana · lado: por lado · anim: tempo del orbe si no hay GIF
+def ej(nombre, cue, gif=None, u="reps", n=None, kg=None, lado=False, anim=None):
+    # kg: carga fija o {semana_desde: kg}, p. ej. {1: 12, 3: 16}
+    if isinstance(kg, (int, float)): kg = {1: kg}
+    return dict(nombre=nombre, cue=cue, gif=gif, u=u, n=n, kg=kg, lado=lado, anim=anim)
 
 CALENTAMIENTO = [
     ej("Gato–camello", "Vértebra por vértebra. Inhala al arquear, exhala al redondear.", u="seg", n=35, anim="gato"),
@@ -22,16 +24,16 @@ CALENTAMIENTO = [
 
 SESIONES = {
   "A": dict(nombre="Sesión A", enfoque="Bisagra y empuje", bloques=[
-    dict(ej=[ej("Swing ruso", "Bisagra, no sentadilla. La pesa sube por la cadera, no por los brazos.", "0549", n=12, kg=12),
+    dict(ej=[ej("Swing ruso", "Bisagra, no sentadilla. La pesa sube por la cadera, no por los brazos.", "0549", n=12, kg=16),
              ej("Flexiones", "Cuerpo en línea. Glúteo apretado. Si no llegas a 8, eleva las manos.", "0662", u="max")]),
-    dict(ej=[ej("Goblet squat", "Pesa pegada al pecho. Baja en 3 segundos, pausa 1, sube en 1.", "0534", n=10, kg=12),
-             ej("Remo a una mano", "Codo hacia la cadera, no hacia afuera. Sin rotar el torso.", "0541", n=8, kg=12, lado=True)]),
-    dict(cierre=True, ej=[ej("Suitcase carry", "Una sola mano. Hombros nivelados. El trabajo es no inclinarte.", "2133", u="seg", n=60, kg=12, lado=True)]),
+    dict(ej=[ej("Goblet squat", "Pesa pegada al pecho. Baja en 3 segundos, pausa 1, sube en 1.", "0534", n=10, kg={1: 12, 3: 16}),
+             ej("Remo a una mano", "Codo hacia la cadera, no hacia afuera. Sin rotar el torso.", "0541", n=8, kg={1: 12, 3: 16}, lado=True)]),
+    dict(cierre=True, ej=[ej("Suitcase carry", "Una sola mano. Hombros nivelados. El trabajo es no inclinarte.", "2133", u="seg", n=60, kg=16, lado=True)]),
   ]),
   "B": dict(nombre="Sesión B", enfoque="Unilateral y tracción", bloques=[
-    dict(ej=[ej("Peso muerto rumano a una pierna", "Pesa en la mano contraria a la pierna de apoyo. Cadera atrás.", "1757", n=8, kg=8, lado=True),
-             ej("Press militar a una mano", "Aprieta glúteo y abdomen antes de empujar. Sin arquear la lumbar.", "0361", n=8, kg=8, kg5=12, lado=True)]),
-    dict(ej=[ej("Split squat", "Pie trasero elevado. El peso adelante. Baja vertical.", "0410", n=8, kg=12, lado=True),
+    dict(ej=[ej("Peso muerto rumano a una pierna", "Pesa en la mano contraria a la pierna de apoyo. Cadera atrás.", "1757", n=8, kg={1: 8, 5: 12}, lado=True),
+             ej("Press militar a una mano", "Aprieta glúteo y abdomen antes de empujar. Sin arquear la lumbar.", "0361", n=8, kg={1: 8, 5: 12}, lado=True)]),
+    dict(ej=[ej("Split squat", "Pie trasero elevado. El peso adelante. Baja vertical.", "0410", n=8, kg={1: 12, 5: 16}, lado=True),
              ej("Apertura posterior con banda", "Codos altos, tira hacia la cara. Compensa el escritorio.", "0993", n=20)]),
     dict(cierre=True, ej=[ej("Dead bug", "Lumbar pegada al piso todo el tiempo. Si se despega, acorta el rango.", "0276", n=10, lado=True)]),
   ]),
