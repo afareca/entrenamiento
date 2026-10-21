@@ -96,6 +96,17 @@ p{font-size:16px;line-height:1.55}
 .orbe-wrap{width:min(78vw,300px);aspect-ratio:1;border-radius:28px;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;padding:0 6px 34px;box-shadow:0 10px 30px rgba(120,80,60,.10)}
 .orbe{width:42%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#E7C9B9,#B9654A 75%);
   transition:transform 4s cubic-bezier(.45,.05,.35,1);box-shadow:0 0 0 18px rgba(185,101,74,.08),0 0 0 40px rgba(185,101,74,.05)}
+.hoja{width:100%;background-repeat:no-repeat;background-size:400% 100%;animation:hoja 2.6s steps(4) infinite}
+@keyframes hoja{from{background-position:0 0}to{background-position:133.333% 0}}
+.espera{width:42%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#E7C9B9,#B9654A 75%);animation:respira 10s ease-in-out infinite}
+@keyframes respira{0%,100%{transform:scale(.9)}40%{transform:scale(1.15)}}
+.hoycard{margin-top:16px}
+.hoycard h3{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.1;margin-top:4px}
+.dias{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.dias button{padding:10px 4px;border-radius:12px;border:1px solid var(--linea);background:var(--fondo);font-size:13px;line-height:1.25;color:var(--suave)}
+.dias button b{display:block;font-family:var(--serif);font-size:18px;color:var(--tinta)}
+.dias button.on{background:var(--tinta);border-color:var(--tinta);color:#E4DBCF}
+.dias button.on b{color:#fff}
 .orbe-txt{position:absolute;bottom:7%;left:0;right:0;text-align:center;font-family:var(--serif);font-size:22px;color:var(--barro)}
 .nombre{font-family:var(--serif);font-weight:600;font-size:clamp(28px,8vw,36px);text-align:center;line-height:1.08;margin-top:18px;letter-spacing:-.01em}
 .lado{display:inline-block;margin-top:8px;background:var(--barro-claro);color:var(--barro);font-weight:700;font-size:13px;padding:5px 12px;border-radius:99px}
@@ -147,6 +158,12 @@ ul.lista li{padding:10px 0;border-bottom:1px solid var(--linea);font-size:15px;l
   </div>
   <div class="fases" id="i-fases"><div></div><div></div><div></div></div>
   <p class="suave" style="margin-top:12px" id="i-meta"></p>
+  <div class="card hoycard">
+    <div class="kicker">Hoy</div>
+    <h3 id="i-dia">Core profundo</h3>
+    <div class="dias" id="i-dias"></div>
+    <p class="suave" style="font-size:14px;margin-top:10px" id="i-manana"></p>
+  </div>
   <div id="i-aviso" style="margin-top:14px"></div>
   <div style="margin-top:18px"><button class="btn pri" id="b-empezar">Empezar · <span id="i-dur">10 min</span></button></div>
   <div class="stats">
@@ -248,7 +265,8 @@ ul.lista li{padding:10px 0;border-bottom:1px solid var(--linea);font-size:15px;l
   <h2 style="margin-top:6px">Por qué así</h2>
   <ul class="lista" style="margin-top:10px">
     <li><b>Primero el piso pélvico, después la carga.</b> El abdomen profundo y el piso pélvico trabajan juntos con la respiración. Se reconecta ese equipo antes de exigirle.</li>
-    <li><b>Todos los días, poco.</b> Las guías recomiendan entrenar el piso pélvico a diario. Diez minutos constantes hacen más que una hora una vez.</li>
+    <li><b>Todos los días, poco.</b> Las guías recomiendan entrenar el piso pélvico a diario, así que los primeros 2 minutos son siempre respiración y piso pélvico. Diez minutos constantes hacen más que una hora una vez.</li>
+    <li><b>El resto rota.</b> Core, glúteo y piernas, espalda y brazos, y un día de movilidad: A, B, C, A, B, C, D. Cada enfoque se repite dos veces por semana para que notes el avance sin repetir el mismo día.</li>
     <li><b>Sube por síntomas, no por calendario.</b> Cada fase dura mínimo 4 semanas. Solo avanzas si las últimas 5 sesiones salieron sin escapes, sin peso pélvico, sin dolor y sin abombamiento.</li>
     <li><b>Siempre exhalar en el esfuerzo.</b> Aguantar el aire empuja presión hacia abajo, contra el piso pélvico y la cicatriz.</li>
     <li><b>Nada de abdominales clásicos.</b> Crunch, sit-up y plancha larga quedan fuera hasta tener control.</li>
@@ -302,6 +320,12 @@ function revisarAvance(){
   return null;
 }
 function faseActiva(){ return st.fman||st.fase; }
+var DIAS=DATA.dias, ROT=DATA.rotacion;
+function diaRotacion(k){ return ROT[((st.pos||0)+(k||0))%ROT.length]; }
+/* avanza la rotación desde el día que realmente se hizo */
+function avanzaRotacion(d){ var p=st.pos||0; for(var i=0;i<ROT.length;i++){ if(ROT[(p+i)%ROT.length]===d){ st.pos=(p+i+1)%ROT.length; return; } } }
+function diaHoy(){ return st.dforzar||diaRotacion(0); }
+function diaManana(){ if(st.dforzar){ var i=ROT.indexOf(st.dforzar); return ROT[(i+1)%ROT.length]; } return diaRotacion(1); }
 
 /* ---------- navegación ---------- */
 function ir(id){
@@ -337,7 +361,13 @@ function pintarInicio(){
   $('i-fase').textContent='Fase '+f.n+' · '+f.nombre;
   $('i-semana').textContent=st.inicio?'Semana '+semana():'Empiezas hoy';
   $('i-meta').textContent=f.meta;
-  $('i-dur').textContent=Math.round(f.total/60)+' min';
+  var dh=diaHoy(); $('i-dur').textContent=Math.round(f.total[dh]/60)+' min';
+  $('i-dia').textContent=DIAS[dh];
+  $('i-manana').textContent='Mañana: '+DIAS[diaManana()].toLowerCase()+'. Puedes cambiar el de hoy.';
+  var di=$('i-dias'); di.innerHTML='';
+  ['A','B','C','D'].forEach(function(k){ var b=document.createElement('button'); b.className=k===dh?'on':'';
+    b.innerHTML='<b>'+k+'</b>'+DIAS[k].split(/[ ,]/)[0];
+    b.addEventListener('click',function(){ st.dforzar=(k===diaRotacion(0))?null:k; guardar(); pintarInicio(); }); di.appendChild(b); });
   var fs=$('i-fases').children; for(var i=0;i<3;i++) fs[i].classList.toggle('ok',i<f.n);
   var av=$('i-aviso'); av.innerHTML='';
   if(aviso==='sube') av.innerHTML='<div class="aviso sube"><b>Subiste a la fase '+st.fase+'.</b> Cinco sesiones limpias seguidas. Primera vez con ejercicios nuevos: ve lento.</div>';
@@ -394,11 +424,11 @@ function despierto(on){ try{ if(on&&'wakeLock' in navigator){ navigator.wakeLock
 document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible'&&corriendo) despierto(true); });
 
 /* ---------- reproductor ---------- */
-var sesion=null, idx=0, fasePaso='prep', resta=0, total=0, tick=null, corriendo=false, pausado=false, faseHoy=1, orbeT=null;
+var diaSes='A', sesion=null, idx=0, fasePaso='prep', resta=0, total=0, tick=null, corriendo=false, pausado=false, faseHoy=1, orbeT=null;
 var R=46, CIRC=2*Math.PI*R;
 
 function arrancar(n){
-  faseHoy=n; sesion=PROG[n-1].pasos; idx=0; corriendo=true; pausado=false;
+  faseHoy=n; diaSes=diaHoy(); sesion=PROG[n-1].dias[diaSes]; idx=0; corriendo=true; pausado=false;
   if(!st.inicio){ st.inicio=hoyISO(); guardar(); }
   var pr=$('p-prog'); pr.innerHTML=''; sesion.forEach(function(){ var d=document.createElement('div'); d.appendChild(document.createElement('i')); pr.appendChild(d); });
   $('p-de').textContent=sesion.length; ir('player'); despierto(true); iconoPausa();
@@ -420,13 +450,16 @@ function entrarTrans(seg,primera){
 }
 function entrarEjercicio(){
   fasePaso='ej'; var p=sesion[idx]; resta=p.seg; total=p.seg; tono(true);
-  var media=p.gif?'<div class="media"><img alt="" src="'+MEDIA[p.gif]+'"></div>'
-    :'<div class="orbe-wrap" id="fig"></div>';
+  var m=MEDIA[p.id], media;
+  if(m&&m.tipo==='hoja') media='<div class="media"><div class="hoja" style="aspect-ratio:'+m.ar+';background-image:url('+m.src+')"></div></div>';
+  else if(m) media='<div class="media"><img alt="" src="'+m.src+'"></div>';
+  else if(p.anim) media='<div class="orbe-wrap" id="fig"></div>';
+  else media='<div class="orbe-wrap"><div class="espera"></div><div class="orbe-txt">Exhala en el esfuerzo</div></div>';
   $('escena').className='escena';
   $('escena').innerHTML=media+'<div class="nombre">'+p.nombre+'</div>'
     +(p.lados?'<span class="lado" id="lado">Lado derecho</span>':'')
     +'<p class="cue">'+p.cue+'</p>'+relojHTML(p.seg,1);
-  pararOrbe(); if(!p.gif) fig=FIG.crear($('fig'),p.anim,function(){return pausado;});
+  pararOrbe(); if(!m&&p.anim) fig=FIG.crear($('fig'),p.anim,function(){return pausado;});
   pintarBarra(); correr();
 }
 function correr(){ clearInterval(tick); tick=setInterval(paso,1000); actualizarResta(); }
@@ -476,11 +509,12 @@ $('c-salir').addEventListener('click',function(){ if(confirm('¿Terminar la sesi
 function terminar(){
   clearInterval(tick); pararOrbe(); corriendo=false; despierto(false);
   tono(true); setTimeout(function(){tono(true);},380); hablar('Listo. Buen trabajo.');
-  $('f-resumen').textContent='Fase '+faseHoy+' · '+PROG[faseHoy-1].nombre+' · '+(idx+1)+' de '+sesion.length+' ejercicios';
+  $('f-resumen').textContent=DIAS[diaSes]+' · fase '+faseHoy+' · '+(idx+1)+' de '+sesion.length+' ejercicios';
   initSel('sensa','bien'); initSel('abomba','0'); ir('fin');
 }
 $('b-guardar').addEventListener('click',function(){
-  st.sesiones.push({f:hoyISO(),fase:faseHoy,escape:hoyCheck.escape||0,peso:hoyCheck.peso||0,dolor:hoyCheck.dolor||0,
+  st.dforzar=null; avanzaRotacion(diaSes);
+  st.sesiones.push({f:hoyISO(),dia:diaSes,fase:faseHoy,escape:hoyCheck.escape||0,peso:hoyCheck.peso||0,dolor:hoyCheck.dolor||0,
     abomba:+sel.abomba,sensa:sel.sensa,hechos:idx+1});
   guardar(); ir('inicio');
 });
@@ -503,9 +537,9 @@ $('b-tguardar').addEventListener('click',function(){
 
 /* ---------- ver sesión ---------- */
 $('b-ver').addEventListener('click',function(){
-  var f=PROG[faseActiva()-1]; $('v-k').textContent='Fase '+f.n+' · semanas '+f.semanas; $('v-t').textContent=f.nombre;
-  $('v-lista').innerHTML=f.pasos.map(function(p){ return '<div class="ej"><span>'+p.nombre+(p.lados?' · ambos lados':'')+'</span><span>'+p.seg+' s</span></div>'; }).join('')
-    +'<p class="suave" style="font-size:14px;margin-top:12px">'+Math.round(f.total/60)+' minutos con transiciones de '+TRANS+' s.</p>';
+  var f=PROG[faseActiva()-1], dh=diaHoy(); $('v-k').textContent='Fase '+f.n+' · '+f.nombre+' · semanas '+f.semanas; $('v-t').textContent=DIAS[dh];
+  $('v-lista').innerHTML=f.dias[dh].map(function(p){ return '<div class="ej"><span>'+p.nombre+(p.lados?' · ambos lados':'')+'</span><span>'+p.seg+' s</span></div>'; }).join('')
+    +'<p class="suave" style="font-size:14px;margin-top:12px">'+Math.round(f.total[dh]/60)+' minutos con transiciones de '+TRANS+' s.</p>';
   ir('ver'); });
 $('b-info').addEventListener('click',function(){ ir('info'); });
 
