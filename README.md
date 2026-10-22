@@ -6,6 +6,8 @@ Dos apps web autocontenidas, publicadas con GitHub Pages.
 |---|---|---|
 | Fuerza — kettlebells, 2 sesiones/semana, 8 semanas | https://afareca.github.io/entrenamiento/ | `fuente/fuerza/` |
 | Núcleo — core posparto, 10 min diarios, rutina que rota por día | https://afareca.github.io/entrenamiento/core.html | `fuente/nucleo/` |
+| Vigor — fuerza 65+, peso corporal, 12 semanas | https://afareca.github.io/entrenamiento/vigor.html | `fuente/mayores/` |
+| Amplitud — flexibilidad, fuerza y equilibrio 65+, 12 semanas | https://afareca.github.io/entrenamiento/amplitud.html | `fuente/mayores/` |
 | Prueba de tonos | https://afareca.github.io/entrenamiento/tonos.html | — |
 
 ## Cambiar una rutina
