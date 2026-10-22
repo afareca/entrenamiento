@@ -98,7 +98,8 @@ ffmpeg -y -ss 1.2 -i medios/<id>.mp4 -frames:v 1 -q:v 5 medios/<id>.poster.jpg  
 ```
 
 3. Las fijas van a JPG de 768 × 512 con calidad 84. Revisa que no lleguen truncadas: ya llegaron dos PNG cortados.
-4. Antes de integrar, revisa cada animación cuadro por cuadro. Hazlo con hojas de contacto de 4 a 6 cuadros por GIF usando Pillow. Fallas típicas de la interpolación: doble contorno en los cuadros intermedios, la figura que cambia de escala entre poses, objetos que cambian de tamaño y movimientos que casi no se ven.
+4. Para Vigor y Amplitud el zip trae además `por_poses/`: las mismas animaciones con 4 poses a 600 ms, sin fantasmas pero a saltos. Se usan en los ejercicios con doble contorno fuerte: Vigor `sentarse_pararse pmr_libre marcha flexion_rodillas zancada_atras sentadilla_bulgara sentadilla flexion_inclinada flexion_pared`; Amplitud `sentarse_pararse marcha flexion_pared flexion_inclinada zancada_apoyo zancada_atras sentadilla gato`. Para personas mayores pesa más la claridad que la suavidad. Si el zip trae solo GIF, convertir con `ffmpeg -i x.gif -r 20` y los mismos parámetros H.264.
+5. Antes de integrar, revisa cada animación cuadro por cuadro. Hazlo con hojas de contacto de 4 a 6 cuadros por GIF usando Pillow. Fallas típicas de la interpolación: doble contorno en los cuadros intermedios, la figura que cambia de escala entre poses, objetos que cambian de tamaño y movimientos que casi no se ven.
 
 Con H.264 los medios son livianos: entre 27 y 33 KB por video en promedio y 1,7 MB la app Núcleo completa con 37 medios.
 
@@ -121,7 +122,7 @@ Con H.264 los medios son livianos: entre 27 y 33 KB por video en promedio y 1,7 
 
 ## Pendientes
 
-- **Vigor y Amplitud**: faltan las 72 ilustraciones (van en `fuente/mayores/medios/vigor/` y `.../amplitud/`). El commit local con las dos apps está **sin publicar** a la espera de esas imágenes y de la confirmación del dueño.
+- **Amplitud**: el personaje salió con cabello castaño y aspecto más joven que lo pedido (entrecano, 65). Funciona, pero si se rehace, mantener los mismos nombres de archivo. `respira_sentada` y `toracica_silla` casi no muestran movimiento.
 - **Núcleo**: rehacer las animaciones de oso sostenido y plancha con toque de hombro, que casi no muestran movimiento. Hay doble contorno en goblet, sentadilla, peso muerto a una pierna, swing y bird dog.
 - **Vigor y Amplitud, fase 4 con bandas** después de la semana 12.
 - **Fuerza después de la semana 8**: el plan original preveía que el tren inferior se quedaba sin estímulo; la pesa de 16 kg lo extiende, pero el siguiente paso es una de 20 kg.
