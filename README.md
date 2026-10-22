@@ -10,6 +10,8 @@ Dos apps web autocontenidas, publicadas con GitHub Pages.
 | Amplitud — flexibilidad, fuerza y equilibrio 65+, 12 semanas | https://afareca.github.io/entrenamiento/amplitud.html | `fuente/mayores/` |
 | Prueba de tonos | https://afareca.github.io/entrenamiento/tonos.html | — |
 
+Para trabajar el proyecto con Claude Code, ver `CLAUDE.md`: arquitectura, cómo construir y probar, medios y pendientes.
+
 ## Cambiar una rutina
 
 1. Edita el programa en `fuente/<app>/build.py`.

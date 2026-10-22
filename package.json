@@ -1,0 +1,10 @@
+{
+  "name": "entrenamiento",
+  "private": true,
+  "description": "Apps de entrenamiento autocontenidas en HTML, publicadas con GitHub Pages",
+  "scripts": {
+    "build": "cd fuente/fuerza && python3 build.py && cp dist/index.html ../../index.html && cd ../nucleo && python3 build.py && cp dist/core.html ../../core.html && cd ../mayores && python3 build.py && cp dist/vigor.html dist/amplitud.html ../../",
+    "test": "node pruebas/fuerza.js && node pruebas/nucleo.js && node pruebas/mayores.js vigor && node pruebas/mayores.js amplitud"
+  },
+  "devDependencies": { "jsdom": "^26.0.0", "playwright": "^1.50.0" }
+}

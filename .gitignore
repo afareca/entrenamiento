@@ -1,2 +1,5 @@
 fuente/*/dist/
-node_modules/
+node_modules
+package-lock.json
+pruebas/capturas/
+__pycache__/
