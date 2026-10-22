@@ -93,6 +93,7 @@ p{font-size:16px;line-height:1.55}
 .media{width:min(78vw,300px);aspect-ratio:1;border-radius:28px;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;
   box-shadow:0 10px 30px rgba(120,80,60,.10)}
 .media img{width:100%;height:100%;object-fit:contain;image-rendering:auto}
+.media video{width:100%;height:100%;object-fit:contain;background:#FCFCFC}
 .orbe-wrap{width:min(78vw,300px);aspect-ratio:1;border-radius:28px;background:#fff;display:flex;align-items:center;justify-content:center;position:relative;padding:0 6px 34px;box-shadow:0 10px 30px rgba(120,80,60,.10)}
 .orbe{width:42%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#E7C9B9,#B9654A 75%);
   transition:transform 4s cubic-bezier(.45,.05,.35,1);box-shadow:0 0 0 18px rgba(185,101,74,.08),0 0 0 40px rgba(185,101,74,.05)}
@@ -452,6 +453,7 @@ function entrarEjercicio(){
   fasePaso='ej'; var p=sesion[idx]; resta=p.seg; total=p.seg; tono(true);
   var m=MEDIA[p.id], media;
   if(m&&m.tipo==='hoja') media='<div class="media"><div class="hoja" style="aspect-ratio:'+m.ar+';background-image:url('+m.src+')"></div></div>';
+  else if(m&&m.tipo==='video') media='<div class="media"><video src="'+m.src+'"'+(m.poster?' poster="'+m.poster+'"':'')+' autoplay loop muted playsinline webkit-playsinline preload="auto"></video></div>';
   else if(m) media='<div class="media"><img alt="" src="'+m.src+'"></div>';
   else if(p.anim) media='<div class="orbe-wrap" id="fig"></div>';
   else media='<div class="orbe-wrap"><div class="espera"></div><div class="orbe-txt">Exhala en el esfuerzo</div></div>';
@@ -497,7 +499,8 @@ var fig=null;
 function pararOrbe(){ if(fig){ fig.parar(); fig=null; } }
 
 function iconoPausa(){ $('ico-pausa').innerHTML=pausado?'<path d="M8 5l11 7-11 7z"/>':'<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'; }
-$('c-pausa').addEventListener('click',function(){ pausado=!pausado; iconoPausa(); if(pausado) callar(); });
+$('c-pausa').addEventListener('click',function(){ pausado=!pausado; iconoPausa(); if(pausado) callar();
+  var v=document.querySelector('#escena video'); if(v){ try{ pausado?v.pause():v.play(); }catch(e){} } });
 $('c-sig').addEventListener('click',function(){ clearInterval(tick); callar();
   if(fasePaso==='trans') return entrarEjercicio();
   if(idx<sesion.length-1){ idx++; entrarTrans(TRANS); } else terminar(); });

@@ -3,7 +3,7 @@
 Edita PROGRAMA y corre: python3 build.py  ->  dist/core.html (autocontenido).
 
 Imágenes: pon el archivo en medios/ con el id del ejercicio (puente.png, gato.gif...).
-  · .gif / .webp / .jpg  -> se muestra tal cual
+  · .mp4 (H.264) -> video en bucle, sin sonido · .gif / .webp / .jpg -> se muestra tal cual
   · .png horizontal de 4 cuadros (ancho >= 3x alto) -> la app lo anima en bucle
   · .png normal -> imagen fija
 Si no hay archivo en medios/, usa el GIF de catálogo de RESPALDO, luego la figura animada, luego un orbe."""
@@ -119,15 +119,17 @@ ids = sorted({p["id"] for f in PROGRAMA for d in f["dias"].values() for p in d} 
 MEDIA, propias, respaldo, sin = {}, [], [], []
 for i in ids:
     hecho = False
-    for ext, mime in (("gif", "image/gif"), ("webp", "image/webp"), ("jpg", "image/jpeg"), ("png", "image/png")):
+    for ext, mime in (("mp4", "video/mp4"), ("gif", "image/gif"), ("webp", "image/webp"), ("jpg", "image/jpeg"), ("png", "image/png")):
         p = f"medios/{i}.{ext}"
         if os.path.exists(p):
-            tipo = "img"
+            tipo = "video" if ext == "mp4" else "img"
             if ext == "png":
                 w, h = png_size(p)
                 if w >= 3 * h: tipo = "hoja"
             MEDIA[i] = dict(src=b64(p, mime), tipo=tipo)
-            if tipo == "hoja": MEDIA[i]["ar"] = round(w / 4 / h, 4); propias.append(i); hecho = True; break
+            if tipo == "video" and os.path.exists(f"medios/{i}.poster.jpg"): MEDIA[i]["poster"] = b64(f"medios/{i}.poster.jpg", "image/jpeg")
+            if tipo == "hoja": MEDIA[i]["ar"] = round(w / 4 / h, 4)
+            propias.append(i); hecho = True; break
     if not hecho and i in RESPALDO:
         MEDIA[i] = dict(src=b64(f"gifs/{RESPALDO[i]}.gif", "image/gif"), tipo="img"); respaldo.append(i); hecho = True
     if not hecho: sin.append(i)

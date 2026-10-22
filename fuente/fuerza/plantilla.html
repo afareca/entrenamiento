@@ -99,7 +99,7 @@ p{font-size:16px;line-height:1.55}
 .escena{flex:1;display:flex;flex-direction:column;justify-content:center;padding:18px 0 8px;min-height:0}
 .etq{font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--salvia)}
 .media{width:100%;max-width:340px;aspect-ratio:1;margin:0 auto;border-radius:24px;background:var(--papel);overflow:hidden;display:flex;align-items:center;justify-content:center}
-.media img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.media img,.media video{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
 .nom{font-size:clamp(32px,9.5vw,44px);font-weight:700;letter-spacing:-.04em;line-height:1;margin-top:20px}
 .dosis{font-family:var(--mono);font-size:clamp(18px,5.4vw,22px);color:var(--papel);margin-top:10px}
 .dosis em{font-style:normal;color:var(--salvia)}
@@ -411,6 +411,8 @@ function orbe(tipo){ clearTimeout(orbeT); var seq=TEMPO[tipo]||TEMPO.respira,k=0
   (function sig(){ var o=$('orbe'),t=$('orbe-txt'); if(!o) return; if(pausa){ orbeT=setTimeout(sig,250); return; }
     var s=seq[k++%seq.length]; o.style.transitionDuration=s[0]+'ms'; o.style.transform='scale('+s[1]+')'; t.textContent=s[2]; orbeT=setTimeout(sig,s[0]); })(); }
 var RA=150, CIRC=2*Math.PI*RA;
+function medioHTML(id){ var m=MEDIA[id]; if(!m) return '';
+  return '<div class="media">'+(m.tipo==='video'?'<video src="'+m.src+'"'+(m.poster?' poster="'+m.poster+'"':'')+' autoplay loop muted playsinline webkit-playsinline preload="auto"></video>':'<img alt="" src="'+m.src+'">')+'</div>'; }
 function orbeHTML(num,anillo){
   return '<div class="orbe-zona">'
    +'<div class="halo" style="inset:4%"></div><div class="halo" style="inset:14%"></div>'
@@ -443,14 +445,14 @@ function pintar(){
   if(x.t==='p'){
     var n=P.pasos.filter(function(y){return y.t==='p';}).length, i=P.pasos.slice(0,idx+1).filter(function(y){return y.t==='p';}).length;
     $('r-paso').textContent='calentamiento '+i+'/'+n;
-    h='<div class="etq" style="text-align:center">Calentamiento</div>'+orbeHTML(x.seg,true)
+    h='<div class="etq" style="text-align:center">Calentamiento</div>'+(MEDIA[x.e.gif]?'<div style="margin-top:12px">'+medioHTML(x.e.gif)+'</div><div class="crono" style="font-size:40px;color:var(--papel);margin-top:12px" id="cd">'+x.seg+'</div>':orbeHTML(x.seg,true))
       +'<div style="text-align:center"><div class="nom" style="font-size:clamp(26px,8vw,34px);margin-top:10px">'+x.e.nombre+'</div><p class="cue" style="margin:8px auto 0">'+x.e.cue+'</p></div>';
     E.innerHTML=h; orbe(x.e.anim); cuenta(x.seg,true);
     if(idx>0) hablar(x.e.nombre+'.');
   }else if(x.t==='e'){
     var nEj=P.pasos.filter(function(y){return y.t==='e';}).length, iEj=P.pasos.slice(0,idx+1).filter(function(y){return y.t==='e';}).length;
     $('r-paso').textContent='ejercicio '+iEj+'/'+nEj;
-    h='<div class="media"><img alt="" src="'+MEDIA[x.e.gif]+'"></div>'
+    h=medioHTML(x.e.gif)
      +'<div class="fila" style="margin-top:18px"><span class="etq">Ronda '+x.r+' de '+x.R+'</span>'+(x.e.lado?'<span class="etq" style="color:var(--humo)" id="lado">Ambos lados</span>':'')+'</div>'
      +'<div class="nom" style="margin-top:8px">'+x.e.nombre+'</div><div class="dosis">'+x.d.txt+'</div><p class="cue">'+x.e.cue+'</p>';
     if(x.seg){ h+='<div class="crono" style="font-size:40px;color:var(--papel);margin-top:14px" id="cd">'+x.seg+'</div>'; }
@@ -486,7 +488,8 @@ function cuenta(seg,anillo){
 function siguiente(){ clearInterval(tick); idx++; pintar(); }
 function icono(){ $('ico-p').innerHTML=pausa?'<path d="M8 5l11 7-11 7z"/>':'<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>'; }
 var pIni=0;
-$('c-pausa').addEventListener('click',function(){ pausa=!pausa; if(pausa){ pIni=Date.now(); callar(); } else tPausa+=Date.now()-pIni; icono(); });
+$('c-pausa').addEventListener('click',function(){ pausa=!pausa; if(pausa){ pIni=Date.now(); callar(); } else tPausa+=Date.now()-pIni; icono();
+  var v=document.querySelector('#escena video'); if(v){ try{ pausa?v.pause():v.play(); }catch(e){} } });
 $('c-sig').addEventListener('click',function(){ callar(); siguiente(); });
 $('c-atras').addEventListener('click',function(){ callar(); clearInterval(tick); if(idx>0) idx--; pintar(); });
 $('c-salir').addEventListener('click',function(){ if(confirm('¿Terminar aquí? Se guarda lo hecho.')) terminar(); });
