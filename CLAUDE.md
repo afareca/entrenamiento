@@ -22,7 +22,7 @@ Responde siempre en español. El dueño del repositorio es arquitecto, no progra
 | `tonos.html` | Prueba de tonos | Página para elegir el sonido de la cuenta regresiva | sin fuente; ya cumplió su función |
 | `index.html.html` | — | Solo redirige a `./`; existe para que íconos guardados con el nombre viejo sigan funcionando. No borrar | — |
 
-Cada app tiene su identidad visual: Fuerza oscura (tinta `#1B1B19`, papel `#F5F2EA`, salvia `#8DA383`, Space Grotesk + IBM Plex Mono); Núcleo crema y terracota (`#B9654A`); Vigor azul pizarra (`#3D5A6C`); Amplitud verde eucalipto (`#5F8077`). Núcleo, Vigor y Amplitud usan Fraunces + DM Sans.
+Cada app tiene su identidad visual: Fuerza oscura (tinta `#1B1B19`, papel `#F5F2EA`, salvia `#8DA383`, Space Grotesk + IBM Plex Mono); Núcleo crema y terracota (`#B9654A`); Vigor oscura como Fuerza (tinta `#1B1B19`, papel `#F5F2EA`) con azul pizarra aclarado `#8FB0C2`; Amplitud verde eucalipto (`#5F8077`). Núcleo, Vigor y Amplitud usan Fraunces + DM Sans.
 
 ## Construir y probar
 
@@ -74,7 +74,7 @@ fuente/<app>/
 
 ### Vigor y Amplitud (`fuente/mayores/`)
 
-- Una sola `plantilla.html`, derivada de la de Núcleo, con marcadores `__PALETA__`, `__TITULO__`, `__INFO__` y `__FONDO__`. `build.py` define los dos programas y genera las dos apps.
+- Una sola `plantilla.html`, derivada de la de Núcleo, con marcadores `__PALETA__`, `__TITULO__`, `__INFO__`, `__FONDO__`, `__BARRA__` y `__EXTRA__`. La plantilla nació clara: una app con `oscura=True` recibe `OSCURA_CSS`, que corrige los blancos fijos (botones, selectores, campo de nombre). `build.py` define los dos programas y genera las dos apps.
 - `circuito(lista, vueltas=2)` repite los días de fuerza como circuito. Las vueltas siguientes llevan "· vuelta 2" en el nombre; la voz cambia "·" por coma.
 - Chequeo para hipertensión: "mareo, dolor de cabeza fuerte o dolor en el pecho" **bloquea la sesión** y remite al médico; "olvidó el medicamento" o "dolor articular nuevo" dan una sesión más suave.
 - Semana 13 en adelante: aviso de que es momento de sumar bandas. La fase con bandas **todavía no existe**.

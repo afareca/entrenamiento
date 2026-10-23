@@ -105,9 +105,10 @@ VIGOR = dict(
     <li><b>Del piso, despacio.</b> Al levantarte del piso, pasa primero por sentado unos segundos.</li>
   </ul>
   <div class="aviso alto" style="margin-top:16px"><b>Para y consulta</b> si hay dolor u opresión en el pecho, mareo, falta de aire fuera de lo normal o palpitaciones.</div>""",
-    paleta="""  --fondo:#EEF1F2; --tarjeta:#F8FAFA; --tinta:#1F2A30; --suave:#66737A; --linea:#D9E0E3;
-  --barro:#3D5A6C; --barro-claro:#C9D6DD; --salvia:#5E8577; --alerta:#A8432F; --sintoma:#C9A55C;""",
-    fondo="#EEF1F2", icono=("#EEF1F2", "#C9D6DD", "#8AA3B1", "#3D5A6C"))
+    # Oscura, como Fuerza: tinta y papel de DCA con el azul pizarra aclarado para que lea sobre negro
+    paleta="""  --fondo:#1B1B19; --tarjeta:#232421; --tinta:#F5F2EA; --suave:#A3A199; --linea:#33352F;
+  --barro:#8FB0C2; --barro-claro:#28343B; --salvia:#8DA383; --alerta:#E08C76; --sintoma:#C9A55C;""",
+    oscura=True, fondo="#1B1B19", icono=("#1B1B19", "#28343B", "#4F6E80", "#8FB0C2"))
 
 # ======================= AMPLITUD · Adriana =======================
 A_FIJO = [
@@ -205,6 +206,23 @@ AMPLITUD = dict(
   --barro:#5F8077; --barro-claro:#CFDDD7; --salvia:#46695F; --alerta:#A8432F; --sintoma:#C9A55C;""",
     fondo="#F1F3EF", icono=("#F1F3EF", "#CFDDD7", "#93B1A8", "#5F8077"))
 
+# Ajustes para las apps oscuras: la plantilla nació clara y tiene blancos fijos
+OSCURA_CSS = """
+.btn.pri{color:var(--fondo)}
+.aviso.sube{background:#22302A;color:#B9D1C2}
+.aviso.alto{background:#3A2622;color:#E8A592}
+.sn button.on{background:var(--tinta);color:var(--fondo);box-shadow:none}
+.sn button.on.si{background:var(--barro);color:var(--fondo)}
+.media,.orbe-wrap{background:#FFFFFF;box-shadow:none}
+.dias button.on{background:var(--tinta);border-color:var(--tinta);color:var(--fondo)}
+.dias button.on b{color:var(--fondo)}
+.ctrl button.grande{background:var(--barro);border-color:var(--barro)}
+.ctrl .grande svg{fill:var(--fondo)}
+.opc button.on{color:var(--fondo)}
+#a-nombre{background:var(--tarjeta)!important;color:var(--tinta)}
+input[type=date],input{color-scheme:dark}
+"""
+
 # ======================= construcción =======================
 def icono(colores, ruta):
     from PIL import Image, ImageDraw
@@ -259,7 +277,9 @@ for clave, A in (("vigor", VIGOR), ("amplitud", AMPLITUD)):
                .replace("__PALETA__", A["paleta"])
                .replace("__FONDO__", A["fondo"])
                .replace("__INFO__", A["info"])
-               .replace("__TITULO__", A["titulo"]))
+               .replace("__TITULO__", A["titulo"])
+               .replace("__EXTRA__", OSCURA_CSS if A.get("oscura") else "")
+               .replace("__BARRA__", "black-translucent" if A.get("oscura") else "default"))
     # clave de almacenamiento propia para que no choque con Núcleo si se abre en el mismo teléfono
     out = out.replace("var CLAVE='nucleo.v2';", f"var CLAVE='{clave}.v1';")
     assert f"var CLAVE='{clave}.v1';" in out
