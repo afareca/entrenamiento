@@ -20,6 +20,7 @@ Responde siempre en español. El dueño del repositorio es arquitecto, no progra
 | `vigor.html` | **Vigor** | Fuerza 65+ sin equipo, hipertensión controlada, 3 días por semana de 10 min, 12 semanas | `fuente/mayores/` |
 | `amplitud.html` | **Amplitud** | Flexibilidad 65+ con fuerza y equilibrio, hipertensión controlada, 12 semanas | `fuente/mayores/` |
 | `tonos.html` | Prueba de tonos | Página para elegir el sonido de la cuenta regresiva | sin fuente; ya cumplió su función |
+| `recordatorio_vigor.ics` | — | Recordatorio de calendario opcional para Vigor: lunes, miércoles y viernes 5:50 a. m. (Bogotá). Suena como notificación, no como alarma; para alarma real se configura a mano en la app Reloj | — |
 | `index.html.html` | — | Solo redirige a `./`; existe para que íconos guardados con el nombre viejo sigan funcionando. No borrar | — |
 
 Cada app tiene su identidad visual: Fuerza oscura (tinta `#1B1B19`, papel `#F5F2EA`, salvia `#8DA383`, Space Grotesk + IBM Plex Mono); Núcleo crema y terracota (`#B9654A`); Vigor oscura como Fuerza (tinta `#1B1B19`, papel `#F5F2EA`) con azul pizarra aclarado `#8FB0C2`; Amplitud verde eucalipto (`#5F8077`). Núcleo, Vigor y Amplitud usan Fraunces + DM Sans.
