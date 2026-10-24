@@ -168,7 +168,7 @@ __EXTRA__
   <div id="i-aviso" style="margin-top:14px"></div>
   <div style="margin-top:18px"><button class="btn pri" id="b-empezar">Empezar · <span id="i-dur">10 min</span></button></div>
   <div class="stats">
-    <div class="stat"><b id="s-racha">0</b><span>días seguidos</span></div>
+    <div class="stat"><b id="s-racha">0</b><span id="s-racha-l">días seguidos</span></div>
     <div class="stat"><b id="s-total">0</b><span>sesiones</span></div>
     <div class="stat"><b id="s-semana">0/7</b><span>esta semana</span></div>
   </div>
@@ -288,7 +288,8 @@ function revisarAvance(){
   return null;
 }
 function faseActiva(){ return st.fman||st.fase; }
-var DIAS=DATA.dias, ROT=DATA.rotacion;
+var DIAS=DATA.dias, ROT=DATA.rotacion, META=DATA.meta||7;
+var LETRAS=ROT.filter(function(x,i){return ROT.indexOf(x)===i;}).sort();
 function diaRotacion(k){ return ROT[((st.pos||0)+(k||0))%ROT.length]; }
 /* avanza la rotación desde el día que realmente se hizo */
 function avanzaRotacion(d){ var p=st.pos||0; for(var i=0;i<ROT.length;i++){ if(ROT[(p+i)%ROT.length]===d){ st.pos=(p+i+1)%ROT.length; return; } } }
@@ -316,7 +317,17 @@ function selector(cont,k,valor,cb){
 function initSel(k,v,cb){ var c=document.querySelector('[data-k="'+k+'"]'); if(c) selector(c,k,v,cb); }
 
 /* ---------- inicio ---------- */
+/* con menos de 7 días por semana, la racha cuenta semanas que cumplieron la meta */
+function lunes(d){ var x=new Date(d); x.setHours(12,0,0,0); x.setDate(x.getDate()-((x.getDay()+6)%7)); return hoyISO(x); }
+function rachaSemanas(){
+  var por={}; st.sesiones.forEach(function(s){ var k=lunes(new Date(s.f+'T12:00')); por[k]=por[k]||{}; por[k][s.f]=1; });
+  var cuenta=function(k){ return por[k]?Object.keys(por[k]).length:0; };
+  var d=new Date(), n=0; if(cuenta(lunes(d))<META) d.setDate(d.getDate()-7);
+  while(cuenta(lunes(d))>=META){ n++; d.setDate(d.getDate()-7); }
+  return n;
+}
 function racha(){
+  if(META<7) return rachaSemanas();
   var dias={}; st.sesiones.forEach(function(s){dias[s.f]=1;});
   var d=new Date(), n=0;
   if(!dias[hoyISO(d)]) d.setDate(d.getDate()-1);
@@ -333,8 +344,9 @@ function pintarInicio(){
   $('i-dia').textContent=DIAS[dh];
   $('i-manana').textContent='Mañana: '+DIAS[diaManana()].toLowerCase()+'. Puedes cambiar el de hoy.';
   var di=$('i-dias'); di.innerHTML='';
-  ['A','B','C','D'].forEach(function(k){ var b=document.createElement('button'); b.className=k===dh?'on':'';
-    b.innerHTML='<b>'+k+'</b>'+DIAS[k].split(/[ ,]/)[0];
+  $('i-dias').style.gridTemplateColumns='repeat('+LETRAS.length+',1fr)';
+  LETRAS.forEach(function(k){ var b=document.createElement('button'); b.className=k===dh?'on':'';
+    b.innerHTML='<b>'+k+'</b>'+((DATA.corto&&DATA.corto[k])||DIAS[k].split(/[ ,]/)[0]);
     b.addEventListener('click',function(){ st.dforzar=(k===diaRotacion(0))?null:k; guardar(); pintarInicio(); }); di.appendChild(b); });
   var fs=$('i-fases').children; for(var i=0;i<3;i++) fs[i].classList.toggle('ok',i<f.n);
   var av=$('i-aviso'); av.innerHTML='';
@@ -345,7 +357,8 @@ function pintarInicio(){
   var hoy=hoyISO(), esta=st.sesiones.filter(function(s){return diasEntre(s.f,hoy)<7;});
   var unicos={}; esta.forEach(function(s){unicos[s.f]=1;});
   $('s-racha').textContent=racha(); $('s-total').textContent=st.sesiones.length;
-  $('s-semana').textContent=Object.keys(unicos).length+'/7';
+  $('s-semana').textContent=Object.keys(unicos).length+'/'+META;
+  $('s-racha-l').textContent=META<7?'semanas cumplidas':'días seguidos';
   var cal=$('cal'); cal.innerHTML=''; var mapa={};
   st.sesiones.forEach(function(s){ mapa[s.f]=mapa[s.f]==='sint'?'sint':(limpia(s)?'hecho':'sint'); });
   for(var k=27;k>=0;k--){ var d=new Date(); d.setDate(d.getDate()-k); var iso=hoyISO(d);

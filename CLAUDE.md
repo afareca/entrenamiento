@@ -17,7 +17,7 @@ Responde siempre en español. El dueño del repositorio es arquitecto, no progra
 |---|---|---|---|
 | `index.html` | **Fuerza** | Adulto, kettlebells 8/12/16 kg y bandas, 2 sesiones por semana, 8 semanas, entra con el recovery de Whoop | `fuente/fuerza/` |
 | `core.html` | **Núcleo** | Core posparto, 10 min diarios, 3 fases de 4 semanas, rutina que rota por día | `fuente/nucleo/` |
-| `vigor.html` | **Vigor** | Fuerza 65+ sin equipo, hipertensión controlada, 12 semanas | `fuente/mayores/` |
+| `vigor.html` | **Vigor** | Fuerza 65+ sin equipo, hipertensión controlada, 3 días por semana de 10 min, 12 semanas | `fuente/mayores/` |
 | `amplitud.html` | **Amplitud** | Flexibilidad 65+ con fuerza y equilibrio, hipertensión controlada, 12 semanas | `fuente/mayores/` |
 | `tonos.html` | Prueba de tonos | Página para elegir el sonido de la cuenta regresiva | sin fuente; ya cumplió su función |
 | `index.html.html` | — | Solo redirige a `./`; existe para que íconos guardados con el nombre viejo sigan funcionando. No borrar | — |
@@ -75,6 +75,7 @@ fuente/<app>/
 ### Vigor y Amplitud (`fuente/mayores/`)
 
 - Una sola `plantilla.html`, derivada de la de Núcleo, con marcadores `__PALETA__`, `__TITULO__`, `__INFO__`, `__FONDO__`, `__BARRA__` y `__EXTRA__`. La plantilla nació clara: una app con `oscura=True` recibe `OSCURA_CSS`, que corrige los blancos fijos (botones, selectores, campo de nombre). `build.py` define los dos programas y genera las dos apps.
+- Vigor: 3 sesiones de cuerpo completo (`rotacion=[A,B,C]`, `meta=3`), para que cada músculo trabaje 3 veces por semana. Con `meta` menor que 7 la racha cuenta semanas cumplidas en vez de días seguidos. `corto` da la etiqueta de los botones de día. Amplitud sigue en 7 días.
 - `circuito(lista, vueltas=2)` repite los días de fuerza como circuito. Las vueltas siguientes llevan "· vuelta 2" en el nombre; la voz cambia "·" por coma.
 - Chequeo para hipertensión: "mareo, dolor de cabeza fuerte o dolor en el pecho" **bloquea la sesión** y remite al médico; "olvidó el medicamento" o "dolor articular nuevo" dan una sesión más suave.
 - Semana 13 en adelante: aviso de que es momento de sumar bandas. La fase con bandas **todavía no existe**.
