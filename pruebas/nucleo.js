@@ -15,7 +15,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  let dom=mk({inicio:null,fase:1,sesiones:[],voz:1,nombre:'',fman:0,tests:[{f:'2026-10-14',dedos:1,firme:1}]});let w=dom.window,d=w.document,$=i=>d.getElementById(i),cl=e=>e.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
  await wait(100);
  console.log('1 hoy     :',$('i-dia').textContent,'|',$('i-manana').textContent,'|',$('i-dur').textContent,'| chips:',[...d.querySelectorAll('#i-dias button')].map(b=>b.textContent+(b.className?'*':'')).join(' '));
- cl(d.querySelectorAll('#i-dias button')[3]);
+ cl(d.querySelectorAll('#i-dias button')[6]);
  console.log('2 cambio D:',$('i-dia').textContent,'|',$('i-dur').textContent);
  cl($('b-ver')); console.log('3 ver     :',$('v-t').textContent,'|',[...d.querySelectorAll('#v-lista .ej')].map(x=>x.children[0].textContent).join(', '));
  cl(d.querySelector('[data-ir="inicio"]'));

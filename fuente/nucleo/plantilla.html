@@ -104,7 +104,7 @@ p{font-size:16px;line-height:1.55}
 .hoycard{margin-top:16px}
 .hoycard h3{font-family:var(--serif);font-weight:600;font-size:24px;line-height:1.1;margin-top:4px}
 .dias{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
-.dias button{padding:10px 4px;border-radius:12px;border:1px solid var(--linea);background:var(--fondo);font-size:13px;line-height:1.25;color:var(--suave)}
+.dias button{padding:9px 2px;border-radius:12px;border:1px solid var(--linea);background:var(--fondo);font-size:13px;line-height:1.25;color:var(--suave)}
 .dias button b{display:block;font-family:var(--serif);font-size:18px;color:var(--tinta)}
 .dias button.on{background:var(--tinta);border-color:var(--tinta);color:#E4DBCF}
 .dias button.on b{color:#fff}
@@ -267,7 +267,7 @@ ul.lista li{padding:10px 0;border-bottom:1px solid var(--linea);font-size:15px;l
   <ul class="lista" style="margin-top:10px">
     <li><b>Primero el piso pélvico, después la carga.</b> El abdomen profundo y el piso pélvico trabajan juntos con la respiración. Se reconecta ese equipo antes de exigirle.</li>
     <li><b>Todos los días, poco.</b> Las guías recomiendan entrenar el piso pélvico a diario, así que los primeros 2 minutos son siempre respiración y piso pélvico. Diez minutos constantes hacen más que una hora una vez.</li>
-    <li><b>El resto rota.</b> Core, glúteo y piernas, espalda y brazos, y un día de movilidad: A, B, C, A, B, C, D. Cada enfoque se repite dos veces por semana para que notes el avance sin repetir el mismo día.</li>
+    <li><b>El resto rota.</b> Core, glúteo y piernas, espalda y brazos, cada uno con dos variantes, y un día de movilidad: A, B, C, A2, B2, C2, D. Cada enfoque se trabaja dos veces por semana con ejercicios distintos.</li>
     <li><b>Sube por síntomas, no por calendario.</b> Cada fase dura mínimo 4 semanas. Solo avanzas si las últimas 5 sesiones salieron sin escapes, sin peso pélvico, sin dolor y sin abombamiento.</li>
     <li><b>Siempre exhalar en el esfuerzo.</b> Aguantar el aire empuja presión hacia abajo, contra el piso pélvico y la cicatriz.</li>
     <li><b>Nada de abdominales clásicos.</b> Crunch, sit-up y plancha larga quedan fuera hasta tener control.</li>
@@ -364,10 +364,10 @@ function pintarInicio(){
   $('i-meta').textContent=f.meta;
   var dh=diaHoy(); $('i-dur').textContent=Math.round(f.total[dh]/60)+' min';
   $('i-dia').textContent=DIAS[dh];
-  $('i-manana').textContent='Mañana: '+DIAS[diaManana()].toLowerCase()+'. Puedes cambiar el de hoy.';
+  $('i-manana').textContent='Sigue: '+DIAS[diaManana()].toLowerCase()+'. Puedes cambiar el de hoy.';
   var di=$('i-dias'); di.innerHTML='';
-  ['A','B','C','D'].forEach(function(k){ var b=document.createElement('button'); b.className=k===dh?'on':'';
-    b.innerHTML='<b>'+k+'</b>'+DIAS[k].split(/[ ,]/)[0];
+  ROT.forEach(function(k){ var b=document.createElement('button'); b.className=k===dh?'on':'';
+    b.innerHTML='<b>'+k+'</b>'+DATA.corto[k];
     b.addEventListener('click',function(){ st.dforzar=(k===diaRotacion(0))?null:k; guardar(); pintarInicio(); }); di.appendChild(b); });
   var fs=$('i-fases').children; for(var i=0;i<3;i++) fs[i].classList.toggle('ok',i<f.n);
   var av=$('i-aviso'); av.innerHTML='';

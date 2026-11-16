@@ -105,8 +105,57 @@ PROGRAMA = [
        e("angel_pared", "Ángel en pared", 50, "Sin despegar los codos.")],
     D=MOVILIDAD)),
 ]
-NOMBRE_DIA = dict(A="Core profundo", B="Glúteo y piernas", C="Espalda, brazos y postura", D="Movilidad y estiramientos")
-ROTACION = ["A", "B", "C", "A", "B", "C", "D"]
+# Segunda variante de cada día de fuerza (A2, B2, C2): mismo enfoque, otra selección de ejercicios,
+# armada con las ilustraciones que ya existen. La fase 1 no tiene variantes: A2 repite A.
+VARIANTES = {
+  2: dict(
+    A2=[e("bascula", "Báscula pélvica", 40, "Con pausa de 2 s abajo. Exhala al aplanar la lumbar."),
+        e("talon", "Deslizamiento de talón", 60, "Más lento: 3 s para estirar, 3 s para volver. Alterna.", anim="talon"),
+        e("deadbug", "Dead bug", 60, "Pausa de 1 s extendida. Si el abdomen se abomba, vuelve a la versión con talón."),
+        e("pallof", "Pallof con banda", 60, "Sostén 2 s con los brazos extendidos.", lados=True),
+        e("plancha_lateral", "Plancha lateral en rodillas", 50, "Rodillas apoyadas. Si abomba el abdomen o aguantas el aire, vuelve a la inclinada.", lados=True),
+        e("birddog", "Bird dog", 45, "Sin girar la cadera.", anim="bird")],
+    B2=[e("sentarse_pararse", "Sentarse y pararse", 60, "Baja en 3 segundos, sin dejarte caer. Exhala al pararte."),
+        e("peso_muerto_kb", "Peso muerto con pesa", 60, "Pesa de 8 kg con las dos manos. Cadera atrás, espalda recta. Exhala al subir, nunca aguantes el aire."),
+        e("puente", "Puente con pausa", 50, "Pausa de 2 s arriba, baja lento."),
+        e("pierna_lateral", "Pierna lateral", 60, "3 s arriba, 3 s abajo.", lados=True),
+        e("sentadilla", "Sentadilla con pausa", 50, "Sin pesa. Pausa de 2 s abajo respirando, exhala al subir."),
+        e("paso_lateral", "Paso lateral con banda", 50, "Pasos amplios, pies paralelos.")],
+    C2=[e("flexion_pared", "Flexión en pared lenta", 60, "Baja en 3 segundos. Exhala al empujar."),
+        e("remo_banda", "Remo con banda", 60, "Pausa de 2 s con los codos atrás."),
+        e("press_banda", "Press de hombro con banda", 60, "Exhala al empujar. Sin arquear la lumbar."),
+        e("apertura_banda", "Apertura con banda", 50, "Pausa de 1 s abierta."),
+        e("toque", "Plancha con toque de hombro", 40, "En rodillas, sin balancear la cadera."),
+        e("pallof", "Pallof con banda", 60, "Para cerrar: resiste el giro, exhala al extender.", lados=True)]),
+  3: dict(
+    A2=[e("birddog", "Bird dog", 60, "Pausa de 3 s extendida.", anim="bird"),
+        e("marcha_supina", "Marcha boca arriba", 50, "Piernas más lejos: baja el talón casi hasta estirar. Lumbar quieta."),
+        e("plancha_lateral", "Plancha lateral", 60, "Sobre rodillas si la completa abomba el abdomen.", lados=True),
+        e("toque", "Plancha con toque de hombro", 45, "Más lento, pausa en cada toque."),
+        e("deadbug", "Dead bug", 50, "Lento, lumbar pegada al piso."),
+        e("oso", "Oso sostenido", 40, "Rodillas a dos centímetros del piso. Respira.")],
+    B2=[e("peso_muerto_kb", "Peso muerto con pesa", 60, "Baja en 3 segundos. Exhala al subir."),
+        e("sentadilla", "Sentadilla con pausa", 60, "Pausa de 2 s abajo, exhala al subir."),
+        e("puente_marcha", "Puente con marcha", 60, "Sin que la cadera se caiga."),
+        e("almeja", "Almeja con banda", 60, "Abre lento, cierra más lento.", lados=True),
+        e("pierna_lateral", "Pierna lateral", 60, "3 s arriba, 3 s abajo.", lados=True),
+        e("sentarse_pararse", "Sentarse y pararse", 45, "Baja en 3 segundos.")],
+    C2=[e("flexion_inclinada", "Flexión inclinada lenta", 60, "Baja en 3 segundos, exhala al subir."),
+        e("remo_banda", "Remo con banda", 60, "Banda más tensa, pausa de 2 s."),
+        e("apertura_banda", "Apertura con banda", 55, "Pausa de 1 s abierta."),
+        e("press_banda", "Press de hombro con banda", 60, "Banda más tensa."),
+        e("toque", "Plancha con toque de hombro", 45, "Sin balancear la cadera."),
+        e("birddog", "Bird dog", 45, "Para cerrar: espalda larga.", anim="bird")]),
+}
+for f in PROGRAMA:
+    v = VARIANTES.get(f["n"], {})
+    d = f["dias"]
+    f["dias"] = dict(A=d["A"], B=d["B"], C=d["C"], A2=v.get("A2", d["A"]), B2=v.get("B2", d["B"]), C2=v.get("C2", d["C"]), D=d["D"])
+NOMBRE_DIA = dict(A="Core profundo", B="Glúteo y piernas", C="Espalda, brazos y postura",
+                  A2="Core profundo · variante", B2="Glúteo y piernas · variante", C2="Espalda y brazos · variante",
+                  D="Movilidad y estiramientos")
+CORTO = dict(A="Core", B="Piernas", C="Espalda", A2="Core", B2="Piernas", C2="Espalda", D="Movilidad")
+ROTACION = ["A", "B", "C", "A2", "B2", "C2", "D"]
 TRANS = 10
 
 # GIFs de catálogo que ya usaba la versión anterior: respaldo mientras llegan las imágenes propias
@@ -147,7 +196,7 @@ def esc(o):
     return json.dumps(o, ensure_ascii=False).replace("<", "\\u003c").replace("&", "\\u0026")
 
 html = open("plantilla.html", encoding="utf-8").read()
-out = (html.replace("__DATA__", esc(dict(programa=PROGRAMA, trans=TRANS, dias=NOMBRE_DIA, rotacion=ROTACION)))
+out = (html.replace("__DATA__", esc(dict(programa=PROGRAMA, trans=TRANS, dias=NOMBRE_DIA, rotacion=ROTACION, corto=CORTO)))
            .replace("__MEDIA__", esc(MEDIA))
            .replace("__ICON__", b64("icon.png", "image/png"))
            .replace("__FIGURA__", open("figura.js", encoding="utf-8").read()))
