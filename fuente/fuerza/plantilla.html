@@ -51,6 +51,7 @@ p{font-size:16px;line-height:1.55}
 .sem{display:flex;align-items:baseline;gap:12px;margin-top:16px}
 .badge{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--salvia);border:1px solid rgba(141,163,131,.4);padding:5px 10px;border-radius:99px}
 .espina{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:16px}
+.espina i{height:12px!important}
 .espina .s{display:flex;flex-direction:column;gap:4px}
 .espina i{display:block;height:16px;border-radius:3px;background:var(--tinta-3)}
 .espina i.ok{background:var(--salvia)}
@@ -100,6 +101,18 @@ p{font-size:16px;line-height:1.55}
 .etq{font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--salvia)}
 .media{width:100%;max-width:340px;aspect-ratio:1;margin:0 auto;border-radius:24px;background:var(--papel);overflow:hidden;display:flex;align-items:center;justify-content:center}
 .media img,.media video{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply}
+.media{position:relative}
+.poses{position:absolute;inset:0}
+.poses i{position:absolute;inset:0;background-repeat:no-repeat;background-size:400% 100%;opacity:0}
+.media.vacia{background:var(--tinta-2);border:1px dashed var(--linea);font-family:var(--mono);font-size:12px;color:var(--tenue);aspect-ratio:16/9}
+.escena.cambio>*{animation:paso .38s cubic-bezier(.2,.7,.2,1) both}
+.escena.cambio>*:nth-child(2){animation-delay:.04s}.escena.cambio>*:nth-child(3){animation-delay:.08s}.escena.cambio>*:nth-child(n+4){animation-delay:.12s}
+@keyframes paso{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.elige{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:14px}
+.elige button{font-family:var(--mono);font-size:14px;padding:10px 0;border:1px solid var(--linea);border-radius:10px;color:var(--humo)}
+.elige button.on{background:var(--papel);color:var(--tinta);border-color:var(--papel)}
+.ciclo{margin-top:16px;padding:16px 18px;border-radius:16px;background:var(--musgo);font-size:15px;line-height:1.5}
+.ciclo button{display:block;margin-top:12px;width:100%;padding:13px;border-radius:12px;background:var(--salvia);color:var(--tinta);font-weight:700}
 .nom{font-size:clamp(32px,9.5vw,44px);font-weight:700;letter-spacing:-.04em;line-height:1;margin-top:20px}
 .dosis{font-family:var(--mono);font-size:clamp(18px,5.4vw,22px);color:var(--papel);margin-top:10px}
 .dosis em{font-style:normal;color:var(--salvia)}
@@ -166,16 +179,18 @@ td input:focus{outline:none;border-color:var(--salvia)}
   <h1>Fuerza</h1>
   <div class="sem"><span class="badge" id="i-fase">Adaptación</span><span class="mono humo" style="font-size:13px" id="i-sem">Semana 1 de 8</span></div>
   <div class="espina" id="espina"></div>
+  <div id="i-ciclo"></div>
   <div class="card prox" style="margin-top:20px">
-    <div class="fila"><span class="k">Siguiente</span><button class="link" id="b-cambiar">Cambiar a B</button></div>
+    <div class="fila"><span class="k">Siguiente</span><span class="k" style="letter-spacing:.12em" id="p-rot"></span></div>
     <h3 id="p-nom">Sesión A</h3>
     <div class="humo" style="font-size:15px;margin-top:2px" id="p-enf"></div>
     <div class="chips" id="p-chips"></div>
     <div class="lista-ej" id="p-lista"></div>
+    <div class="elige" id="p-elige"></div>
   </div>
   <button class="btn pri" style="margin-top:12px" id="b-empezar"><span>Empezar</span><span class="mono" id="p-dur">25 min</span></button>
   <div class="stats">
-    <div><b id="s-tot">0</b><span>de 16 sesiones</span></div>
+    <div><b id="s-tot">0</b><span id="s-tot-l">de 24 sesiones</span></div>
     <div><b id="s-sem">0/2</b><span>esta semana</span></div>
     <div><b id="s-rpe">—</b><span>último RPE</span></div>
   </div>
@@ -282,6 +297,7 @@ $('sinjs').parentNode.removeChild($('sinjs'));
 /* ---------- estado ---------- */
 var CLAVE='fuerza.v2';
 var st={inicio:null,sesiones:[],voz:1,med:{},forzar:null};
+var ROT=D.rotacion, META=D.meta;
 try{ var raw=localStorage.getItem(CLAVE); if(raw) st=Object.assign(st,JSON.parse(raw)); }catch(e){}
 function guardar(){ try{ localStorage.setItem(CLAVE,JSON.stringify(st)); }catch(e){} }
 function iso(d){ d=d||new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
@@ -294,7 +310,9 @@ var COLOR={verde:'var(--salvia)',ambar:'var(--ambar)',rojo:'var(--rojo)'};
 function proxima(){
   if(st.forzar) return st.forzar;
   var u=st.sesiones.filter(function(s){return s.ses!=='C';}).slice(-1)[0];
-  return u&&u.ses==='A'?'B':'A';
+  if(!u) return ROT[0];
+  var ult=u.ses==='A'?'A1':u.ses==='B'?'B1':u.ses, i=ROT.indexOf(ult);   /* A y B son registros de la versión de 2 sesiones */
+  return ROT[(i+1)%ROT.length];
 }
 
 /* ---------- dosis ---------- */
@@ -341,26 +359,32 @@ PINTA.inicio=function(){
   $('saludo').textContent=h<12?'Buenos días, Nicolás':h<19?'Buenas tardes, Nicolás':'Buenas noches, Nicolás';
   $('i-fase').textContent=c.fase;
   $('i-sem').textContent=st.inicio?(sem<=8?'Semana '+sem+' de 8':'Semana '+sem+' · bloque cumplido'):'Empiezas hoy';
-  /* espina: 8 semanas x 2 sesiones */
+  /* espina: 8 semanas x META sesiones */
   var esp=$('espina'); esp.innerHTML='';
   var porSem={}; st.sesiones.forEach(function(s){ if(!st.inicio||s.ses==='C') return; var w=Math.floor(dias(st.inicio,s.f)/7)+1; (porSem[w]=porSem[w]||[]).push(s); });
   for(var w=1;w<=8;w++){ var col=document.createElement('div'); col.className='s'+(w===sem?' actual':'');
-    var arr=porSem[w]||[]; for(var k=0;k<2;k++){ var i=document.createElement('i'); if(arr[k]) i.className=arr[k].rec==='verde'?'ok':'amb'; col.appendChild(i); }
+    var arr=porSem[w]||[]; for(var k=0;k<META;k++){ var i=document.createElement('i'); if(arr[k]) i.className=arr[k].rec==='verde'?'ok':'amb'; col.appendChild(i); }
     var sp=document.createElement('span'); sp.textContent=w; col.appendChild(sp); esp.appendChild(col); }
   var S=D.sesiones[ses], p=plan(ses,sem,'verde');
-  $('p-nom').textContent=S.nombre; $('p-enf').textContent=S.enfoque; $('b-cambiar').textContent='Cambiar a '+(ses==='A'?'B':'A');
+  $('p-nom').textContent=S.nombre; $('p-enf').textContent=S.enfoque;
+  $('p-rot').textContent=ROT.join(' · ');
+  var el=$('p-elige'); el.innerHTML='';
+  ROT.forEach(function(k){ var b=document.createElement('button'); b.textContent=k; b.className=k===ses?'on':'';
+    b.addEventListener('click',function(){ st.forzar=k; guardar(); PINTA.inicio(); }); el.appendChild(b); });
   $('p-chips').innerHTML=['<span class="chip">'+c.rondas+' rondas</span>','<span class="chip">descanso '+c.desc+' s</span>','<span class="chip">RPE '+c.rpe+'</span>'].join('')
     +(c.extra?'<span class="chip">+'+c.extra+' reps</span>':'');
   var vistos={}, lst='';
   S.bloques.forEach(function(b){ b.ej.forEach(function(e){ if(vistos[e.nombre]) return; vistos[e.nombre]=1; lst+='<div><span>'+e.nombre+'</span><span>'+dosis(e,sem,c.extra).plano+'</span></div>'; }); });
   $('p-lista').innerHTML=lst; $('p-dur').textContent='≈ '+duracion(p)+' min';
   var hechas=st.sesiones.filter(function(s){return s.ses!=='C';});
-  $('s-tot').textContent=hechas.length;
+  var delCiclo=hechas.filter(function(s){ return st.inicio&&dias(st.inicio,s.f)>=0; });
+  $('s-tot').textContent=delCiclo.length; $('s-tot-l').textContent='de '+(8*META)+' sesiones';
+  $('i-ciclo').innerHTML=(st.inicio&&sem>8)?'<div class="ciclo"><b>Ciclo de 8 semanas cumplido.</b> Empieza uno nuevo: vuelve a la semana 1 con tus cargas actuales y conserva todo el registro.<button id="b-ciclo">Empezar ciclo nuevo</button></div>':'';
+  var bc=$('b-ciclo'); if(bc) bc.addEventListener('click',function(){ st.inicio=iso(); guardar(); PINTA.inicio(); toast('Semana 1'); });
   var semAct=hechas.filter(function(s){ return st.inicio&&Math.floor(dias(st.inicio,s.f)/7)+1===sem; }).length;
-  $('s-sem').textContent=semAct+'/2';
+  $('s-sem').textContent=semAct+'/'+META;
   var u=hechas.slice(-1)[0]; $('s-rpe').textContent=u&&u.rpe?u.rpe:'—';
 };
-$('b-cambiar').addEventListener('click',function(){ st.forzar=proxima()==='A'?'B':'A'; guardar(); PINTA.inicio(); });
 
 /* ---------- check-in ---------- */
 var rec='verde', sueno=false;
@@ -381,11 +405,18 @@ $('b-ir').addEventListener('click',function(){ arrancar(proxima(),efectivo()); }
 
 /* ---------- audio: tono senoidal 01 + voz ---------- */
 var ctx=null;
-function audio(){ try{ ctx=ctx||new (window.AudioContext||window.webkitAudioContext)(); if(ctx.state==='suspended') ctx.resume(); }catch(e){} return ctx; }
-function tono(arr){ try{ var c=audio(); if(!c) return; var t=c.currentTime+.02,f=arr?880:660,dur=arr?.34:.13;
-  var o=c.createOscillator(),g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(f,t); o.connect(g); g.connect(c.destination);
-  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.35,t+.008); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-  o.start(t); o.stop(t+dur+.05); }catch(e){} }
+var comp=null;
+/* iOS deja el audio 'interrupted' cuando otra fuente toma el control: se reactiva siempre que no esté corriendo */
+function audio(){ try{ if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)();
+    comp=ctx.createDynamicsCompressor(); comp.threshold.value=-10; comp.ratio.value=6; comp.connect(ctx.destination); }
+  if(ctx.state!=='running') ctx.resume(); }catch(e){} return ctx; }
+/* mismas notas (660 y 880 Hz) con dos armónicos y casi el triple de volumen, para pasar por encima de la música */
+function tono(arr){ try{ var c=audio(); if(!c) return; var t=c.currentTime+.02,f=arr?880:660,dur=arr?.45:.18;
+  [[1,.9,'sine'],[2,.35,'sine'],[3,.14,'triangle']].forEach(function(p){ var o=c.createOscillator(),g=c.createGain();
+    o.type=p[2]; o.frequency.setValueAtTime(f*p[0],t); o.connect(g); g.connect(comp||c.destination);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(p[1],t+.006); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.start(t); o.stop(t+dur+.05); }); }catch(e){} }
+document.addEventListener('touchstart',function(){ if(ctx&&ctx.state!=='running'){ try{ctx.resume();}catch(e){} } },{passive:true});
 function vozES(){ if(!window.speechSynthesis) return null; var v=speechSynthesis.getVoices()||[], o=['es-419','es-MX','es-US','es-CO','es-AR','es-ES','es'];
   for(var k=0;k<o.length;k++) for(var j=0;j<v.length;j++) if(v[j].lang&&v[j].lang.toLowerCase().indexOf(o[k].toLowerCase())===0) return v[j]; return null; }
 function hablar(t){ if(!st.voz) return; try{ if(!window.speechSynthesis) return; speechSynthesis.cancel(); var u=new SpeechSynthesisUtterance(t),v=vozES();
@@ -411,8 +442,25 @@ function orbe(tipo){ clearTimeout(orbeT); var seq=TEMPO[tipo]||TEMPO.respira,k=0
   (function sig(){ var o=$('orbe'),t=$('orbe-txt'); if(!o) return; if(pausa){ orbeT=setTimeout(sig,250); return; }
     var s=seq[k++%seq.length]; o.style.transitionDuration=s[0]+'ms'; o.style.transform='scale('+s[1]+')'; t.textContent=s[2]; orbeT=setTimeout(sig,s[0]); })(); }
 var RA=150, CIRC=2*Math.PI*RA;
-function medioHTML(id){ var m=MEDIA[id]; if(!m) return '';
+var posesT=null;
+function medioHTML(id){ var m=MEDIA[id]; if(!m) return '<div class="media vacia">Ilustración pendiente</div>';
+  if(m.tipo==='poses'){ var h='<div class="media"><div class="poses" data-ritmo="'+m.ritmo+'">';
+    for(var k=0;k<4;k++) h+='<i style="background-image:url('+m.src+');background-position:'+(k*33.3333)+'% 0"></i>';
+    return h+'</div></div>'; }
   return '<div class="media">'+(m.tipo==='video'?'<video src="'+m.src+'"'+(m.poster?' poster="'+m.poster+'"':'')+' autoplay loop muted playsinline webkit-playsinline preload="auto"></video>':'<img alt="" src="'+m.src+'">')+'</div>'; }
+/* Poses clave con fundido: pausa en el inicio y el final del movimiento, paso rápido por las intermedias */
+var RITMOS={rep:[900,230,900,230],ciclo:[640,640,640,640]};
+function animarPoses(){
+  clearTimeout(posesT); var c=document.querySelector('#escena .poses'); if(!c) return;
+  var capas=c.children, t=RITMOS[c.getAttribute('data-ritmo')]||RITMOS.rep, i=0, z=1;
+  capas[0].style.opacity=1;
+  (function sig(){ posesT=setTimeout(function(){
+    if(!c.isConnected) return; if(pausa) return sig();
+    var ant=capas[i]; i=(i+1)%4; var nu=capas[i];
+    nu.style.zIndex=++z; nu.style.transition='opacity .14s ease-out'; nu.style.opacity=1;
+    setTimeout(function(){ ant.style.transition='none'; ant.style.opacity=0; },170);
+    sig(); },t[i]); })();
+}
 function orbeHTML(num,anillo){
   return '<div class="orbe-zona">'
    +'<div class="halo" style="inset:4%"></div><div class="halo" style="inset:14%"></div>'
@@ -437,8 +485,9 @@ function arrancar(ses,ef){
 }
 function reloj(){ if(!P) return; var s=Math.floor((Date.now()-t0-tPausa)/1000); $('r-reloj').textContent=('0'+Math.floor(s/60)).slice(-2)+':'+('0'+s%60).slice(-2); }
 function pintaLomo(){ var is=$('lomo').children; for(var k=0;k<is.length;k++){ is[k].className=P.pasos[k].t+(k<idx?' h':'')+(k===idx?' a':''); } }
+function entra(E){ E.classList.remove('cambio'); void E.offsetWidth; E.classList.add('cambio'); }
 function pintar(){
-  clearInterval(tick); clearTimeout(orbeT);
+  clearInterval(tick); clearTimeout(orbeT); clearTimeout(posesT);
   if(idx>=P.pasos.length) return terminar();
   var x=P.pasos[idx], E=$('escena'), h='';
   pintaLomo(); inicioPaso=Date.now();
@@ -447,7 +496,7 @@ function pintar(){
     $('r-paso').textContent='calentamiento '+i+'/'+n;
     h='<div class="etq" style="text-align:center">Calentamiento</div>'+(MEDIA[x.e.gif]?'<div style="margin-top:12px">'+medioHTML(x.e.gif)+'</div><div class="crono" style="font-size:40px;color:var(--papel);margin-top:12px" id="cd">'+x.seg+'</div>':orbeHTML(x.seg,true))
       +'<div style="text-align:center"><div class="nom" style="font-size:clamp(26px,8vw,34px);margin-top:10px">'+x.e.nombre+'</div><p class="cue" style="margin:8px auto 0">'+x.e.cue+'</p></div>';
-    E.innerHTML=h; orbe(x.e.anim); cuenta(x.seg,true);
+    E.innerHTML=h; entra(E); animarPoses(); orbe(x.e.anim); cuenta(x.seg,true);
     if(idx>0) hablar(x.e.nombre+'.');
   }else if(x.t==='e'){
     var nEj=P.pasos.filter(function(y){return y.t==='e';}).length, iEj=P.pasos.slice(0,idx+1).filter(function(y){return y.t==='e';}).length;
@@ -457,7 +506,7 @@ function pintar(){
      +'<div class="nom" style="margin-top:8px">'+x.e.nombre+'</div><div class="dosis">'+x.d.txt+'</div><p class="cue">'+x.e.cue+'</p>';
     if(x.seg){ h+='<div class="crono" style="font-size:40px;color:var(--papel);margin-top:14px" id="cd">'+x.seg+'</div>'; }
     else h+='<div class="hecho"><button class="btn pri" id="b-hecho">Hecho</button></div><div class="crono" id="crono">0:00</div>';
-    E.innerHTML=h; tono(true);
+    E.innerHTML=h; entra(E); animarPoses(); tono(true);
     hablar(x.e.nombre+'. '+x.d.voz+'.');
     if(x.seg){ if(x.e.lado){ var l=$('lado'); if(l) l.textContent='Lado derecho'; } cuenta(x.seg,false); }
     else{ $('b-hecho').addEventListener('click',function(){ siguiente(); });
@@ -467,7 +516,7 @@ function pintar(){
     h='<div class="etq" style="text-align:center">'+(x.entre?'Cambio de bloque':'Descanso')+'</div>'+orbeHTML(x.seg,true)
      +'<div class="sig"><small>Sigue</small><b>'+x.sig.nombre+'</b><span>'+x.sd.plano+'</span></div>'
      +'<div class="mini"><button id="m-mas">+15 s</button><button id="m-ya">Listo ya</button></div>';
-    E.innerHTML=h; orbe('respira'); cuenta(x.seg,true);
+    E.innerHTML=h; entra(E); orbe('respira'); cuenta(x.seg,true);
     $('m-mas').addEventListener('click',function(){ resta+=15; total+=15; var c=$('cd'); if(c) c.textContent=resta; });
     $('m-ya').addEventListener('click',function(){ siguiente(); });
   }
@@ -478,7 +527,7 @@ function cuenta(seg,anillo){
     if(pausa) return; resta--;
     var c=$('cd'), a=$('arco'); if(c) c.textContent=Math.max(resta,0);
     if(a) a.setAttribute('stroke-dashoffset',CIRC*(1-Math.max(resta,0)/total));
-    if(x.t==='d'&&resta===9) hablar('Sigue. '+x.sig.nombre+'.');
+    if(x.t==='d'&&resta===Math.min(13,total-2)) hablar('Sigue. '+x.sig.nombre+'.');
     if(x.e&&x.e.lado&&resta===Math.floor(total/2)){ hablar('Cambia de lado.'); tono(false); var l=$('lado'); if(l) l.textContent='Lado izquierdo'; }
     if(x.t==='d'&&resta>=1&&resta<=5) tono(false);
     if(x.t!=='d'&&resta>=1&&resta<=3) tono(false);
@@ -504,7 +553,7 @@ function terminar(){
   P.dur=Math.round(s/60); P.hechos=hechos;
   if(P.ef==='rojo'){ $('f-tit').textContent='Calentamiento hecho'; hablar('Listo. Ahora a caminar treinta minutos.');
     $('f-camina').innerHTML='<div class="ajuste" style="margin-top:16px">Sal a caminar <b>30 minutos</b> a ritmo de conversación. Hoy el cuerpo pide recuperar.</div>'; }
-  else { $('f-tit').textContent='Sesión '+P.ses+' hecha'; hablar('Listo. Buen trabajo.'); $('f-camina').innerHTML=''; }
+  else { $('f-tit').textContent=D.sesiones[P.ses].nombre+' hecha'; hablar('Listo. Buen trabajo.'); $('f-camina').innerHTML=''; }
   $('f-res').textContent=P.dur+' min · '+(P.ef==='rojo'?'calentamiento':hechos+' de '+tot+' ejercicios · '+P.rondas+(P.rondas===1?' ronda':' rondas'))+' · recovery '+(P.ef==='ambar'?'ámbar':P.ef);
   $('f-obj').textContent='Objetivo de esta semana: RPE '+P.c.rpe+'. ¿Cuánto te costó?';
   rpe=null; var r=$('rpe'); r.innerHTML='';

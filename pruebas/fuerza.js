@@ -37,7 +37,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const h=new Date();h.setDate(h.getDate()-45);
  dom=mk({inicio:h.toISOString().slice(0,10),sesiones:[],voz:1,med:{}}); w=dom.window;d=w.document;await wait(100);
  console.log('6 semana 7:',d.getElementById('i-fase').textContent,'|',d.getElementById('i-sem').textContent,'|',d.getElementById('p-chips').textContent,'|',[...d.querySelectorAll('#p-lista div')].slice(0,1).map(x=>x.textContent)[0]);
- d.getElementById('b-cambiar').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
+ d.querySelectorAll('#p-elige button')[3].dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
  console.log('  sesión B:',[...d.querySelectorAll('#p-lista div')].map(x=>x.textContent).slice(0,2).join(' ; '));
  // rojo
  d.getElementById('b-empezar').dispatchEvent(new w.MouseEvent('click',{bubbles:true})); d.querySelector('#semaf [data-v="rojo"]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));

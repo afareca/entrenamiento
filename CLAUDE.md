@@ -15,7 +15,7 @@ Responde siempre en español. El dueño del repositorio es arquitecto, no progra
 
 | Archivo publicado | App | Para quién | Fuente |
 |---|---|---|---|
-| `index.html` | **Fuerza** | Adulto, kettlebells 8/12/16 kg y bandas, 2 sesiones por semana, 8 semanas, entra con el recovery de Whoop | `fuente/fuerza/` |
+| `index.html` | **Fuerza** | Adulto, kettlebells 8/12/16 kg y bandas, 4 sesiones que rotan, 3 días por semana, ciclos de 8 semanas, entra con el recovery de Whoop | `fuente/fuerza/` |
 | `core.html` | **Núcleo** | Core posparto, 10 min diarios, 3 fases de 4 semanas, rutina que rota por día | `fuente/nucleo/` |
 | `vigor.html` | **Vigor** | Fuerza 65+ sin equipo, hipertensión controlada, 3 días por semana de 10 min, 12 semanas | `fuente/mayores/` |
 | `amplitud.html` | **Amplitud** | Flexibilidad 65+ con fuerza y equilibrio, hipertensión controlada, 12 semanas | `fuente/mayores/` |
@@ -58,11 +58,13 @@ fuente/<app>/
 ### Fuerza (`fuente/fuerza/build.py`)
 
 - `CALENTAMIENTO`: 5 movimientos temporizados.
-- `SESIONES`: A (bisagra y empuje) y B (unilateral y tracción), cada una con bloques en superserie y un cierre. Los ejercicios son por repeticiones: el usuario toca **Hecho** al terminar. El carry es temporizado.
+- `SESIONES`: A1 y A2 (bisagra y empuje) y B1 y B2 (unilateral y tracción): dos pares con los mismos patrones y ejercicios distintos. `ROTACION = A1 B1 A2 B2`, `META = 3` días por semana. Los registros viejos con `A` o `B` se leen como A1 y B1. Cada una con bloques en superserie y un cierre. Los ejercicios son por repeticiones: el usuario toca **Hecho** al terminar. El carry es temporizado.
 - `SEMANAS`: rondas, descanso, RPE y repeticiones extra por semana (1–2 adaptación, 3–4 construcción, 5–6 densidad, 7 pico, 8 descarga; después de la 8, mantenimiento con valores de la 7).
 - Carga por semana: `kg={1: 12, 3: 16}` significa 12 kg desde la semana 1 y 16 kg desde la 3. La app toma el umbral más alto alcanzado.
 - Chequeo de entrada con el recovery de Whoop: verde = sesión completa, ámbar o sueño < 6 h = una ronda menos por bloque, rojo = solo calentamiento y caminata de 30 min. **El recovery modula la intensidad, nunca si se entrena.**
-- Descansos con un orbe que respira, voz en el segundo 9 ("Sigue. X") y tonos.
+- Ciclos: pasada la semana 8, el inicio ofrece "Empezar ciclo nuevo", que mueve la fecha de inicio a hoy y conserva el registro. Las estadísticas cuentan solo las sesiones del ciclo actual.
+- Descansos con un orbe que respira, voz en el segundo 13 ("Sigue. X") y tonos. La voz va antes porque en iOS la voz del sistema baja el resto del audio mientras habla y tapaba la cuenta.
+- Animación por poses: `poses.py` arma `medios/<id>.poses.jpg` (tira de 4 poses clave) y la app las alterna con un fundido de 140 ms, con pausa en el inicio y el final del movimiento (`RITMO` por ejercicio: `rep` o `ciclo`). Reemplaza a los videos interpolados, que tenían fantasmas. `ilustraciones.py` es el brief de las 10 ilustraciones de A2 y B2, que aún faltan.
 - Mediciones (día 0, semana 4 y semana 8) y botón "Copiar para Claude" que exporta el registro como texto.
 
 ### Núcleo (`fuente/nucleo/build.py`)
@@ -85,7 +87,7 @@ fuente/<app>/
 
 ### Piezas compartidas del motor (en las plantillas)
 
-- **Tono senoidal**: 660 Hz para la cuenta, 880 Hz para el arranque, sintetizado con Web Audio. Lo eligió el usuario entre cuatro opciones; no cambiarlo sin pedirlo.
+- **Tono senoidal**: 660 Hz para la cuenta, 880 Hz para el arranque, sintetizado con Web Audio. Lo eligió el usuario entre cuatro opciones; no cambiarlo sin pedirlo. En Fuerza suena con dos armónicos y casi el triple de volumen para pasar por encima de la música, y el audio se reactiva siempre que no esté en `running` (iOS lo deja en `interrupted`).
 - **Voz**: `speechSynthesis`, con preferencia `es-419`, `es-MX`, `es-US`, `es-CO`, `es-AR`, `es-ES`. Audio y voz se desbloquean con el primer toque (`despertarAudio()`), porque iOS no los arranca sin un gesto.
 - **Pantalla encendida**: Wake Lock API, que se vuelve a pedir en `visibilitychange`.
 - **Medios** por prioridad: `medios/<id>.mp4` → `.gif`/`.webp`/`.jpg`/`.png` → GIF de catálogo de respaldo (si lo hay) → figura animada → orbe de espera. Un PNG horizontal con ancho ≥ 3 veces el alto se trata como hoja de 4 cuadros y se anima con CSS `steps(4)`.
@@ -128,5 +130,5 @@ Con H.264 los medios son livianos: entre 27 y 33 KB por video en promedio y 1,7 
 - **Amplitud**: el personaje salió con cabello castaño y aspecto más joven que lo pedido (entrecano, 65). Funciona, pero si se rehace, mantener los mismos nombres de archivo. `respira_sentada` y `toracica_silla` casi no muestran movimiento.
 - **Núcleo**: rehacer las animaciones de oso sostenido y plancha con toque de hombro, que casi no muestran movimiento. Hay doble contorno en goblet, sentadilla, peso muerto a una pierna, swing y bird dog.
 - **Vigor y Amplitud, fase 4 con bandas** después de la semana 12.
-- **Fuerza después de la semana 8**: el plan original preveía que el tren inferior se quedaba sin estímulo; la pesa de 16 kg lo extiende, pero el siguiente paso es una de 20 kg.
+- **Fuerza**: faltan las 10 ilustraciones de A2 y B2 (hoy muestran "Ilustración pendiente"). Falta decidir la voz según la prueba de `sonido.html`. Pendientes de la revisión general: registrar kilos y repeticiones reales, retomar una sesión interrumpida, reloj contra la hora real y restaurar el registro. El siguiente paso de carga es una pesa de 20 kg.
 - Ideas que se evaluaron y quedaron para después: sincronizar el registro (hoy es "Copiar para Claude") y un conector propio a la API de Whoop. HealthKit exigiría app nativa; se descartó.
