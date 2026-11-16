@@ -71,6 +71,7 @@ fuente/<app>/
 
 - `FIJO`: 2 minutos diarios de respiración y piso pélvico, siempre al inicio.
 - `PROGRAMA`: 3 fases (Reconexión, Control, Fuerza), cada una con días A core, B glúteo y piernas, C espalda y brazos, D movilidad.
+- Kettlebell de 8 kg desde la fase 2 en tres ejercicios lentos (sentadilla al pecho, peso muerto y remo), con la indicación de quitarla si el abdomen se abomba. Swing, press sobre la cabeza y giros con peso quedan fuera.
 - `ROTACION = A B C A B C D`. El estado guarda `pos`; al guardar una sesión, `avanzaRotacion(dia)` busca ese día desde `pos` y avanza. Así, si el usuario cambia el día a mano, la rotación sigue desde lo que hizo de verdad.
 - Todo es temporizado y corre solo: transición de 10 s con voz, cuenta 3-2-1 y aviso de "cambia de lado" a mitad de los ejercicios por lado.
 - Chequeo de síntomas posparto; con un síntoma, ese día baja una fase. Se sube de fase solo si el calendario lo permite **y** las últimas 5 sesiones de la fase salieron limpias.
